@@ -1,0 +1,14 @@
+version: '1.0'
+services:
+  nginx:
+    image: nginx:1.20.1
+    volumes:
+      - ./conf.d:/etc/nginx/conf.d:ro
+      - /home/deploy/yvonne/:/var/www
+    ports:
+      - "3101:3101"
+    networks:
+      internal:  {}
+    restart: always
+networks:
+  internal: {}
