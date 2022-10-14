@@ -1,0 +1,1 @@
+>注意： docker commit 命令除了学习之外，
