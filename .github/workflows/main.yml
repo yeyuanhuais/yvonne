@@ -14,9 +14,9 @@ jobs:
       - name: copy file via ssh password
         uses: appleboy/scp-action@master
         with:
-          host: "yyh28.top"
-          username: "deploy"
-          password: ${{ secrets.DEPLOY_PASSWORD }}
-          port: 22
-          source: "./*"
-          target: "/Runtime/yvonne/"
+          # host: "yyh28.top"
+          # username: "deploy"
+          # password: ${{ secrets.DEPLOY_PASSWORD }}
+          # port: 22
+          # source: "./*"
+          # target: "/Runtime/yvonne/"
