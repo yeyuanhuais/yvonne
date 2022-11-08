@@ -1,0 +1,18 @@
+---
+tags:
+  - docker
+---
+
+# Docker
+
+import DocCardList from '@theme/DocCardList';
+
+[docker - 从入门到实践](https://yeasy.gitbook.io/docker_practice/)
+
+<DocCardList />
+
+## 常用命令
+
+` docker rmi $(docker images -f "dangling=true" -q) ` Docker 删除所有无名称的镜像（悬空镜像）
+
+` docker stop containerID ` 容器停止运行 
