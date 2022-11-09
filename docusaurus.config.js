@@ -24,6 +24,9 @@ const config = {
         },
         blog: {
           showReadingTime: true,
+          readingTime: ({ content, frontMatter, defaultReadingTime }) => defaultReadingTime({ content, options: { wordsPerMinute: 300 } }),
+          blogSidebarTitle: "全部博文",
+          blogSidebarCount: "ALL",
         },
         theme: {
           customCss: require.resolve("./src/css/custom.css"),
