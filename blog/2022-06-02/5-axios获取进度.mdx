@@ -1,0 +1,19 @@
+---
+slug: axios获取进度
+title: axios获取进度
+authors: [yvonne]
+tags: [axios]
+---
+<!--truncate-->
+
+### 调用示例
+```javascript 
+axios
+  .post("url", {}, {
+    onUploadProgress: (p) => {
+      p.loaded != p.total && setLoadNum(parseInt(100 * (p.loaded / p.total)));
+    },
+    onDownloadProgress: (p) => {},
+  })
+```
+ 

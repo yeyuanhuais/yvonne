@@ -1,0 +1,28 @@
+---
+slug: 指定某个日期（字符串），增加n天后，输出日期字符串，格式：年-月-日；
+title: 指定某个日期（字符串），增加n天后，输出日期字符串，格式：年-月-日；
+authors: [yvonne]
+tags: [javascript]
+---
+<!--truncate-->
+
+```js
+/**
+ * [dateAddDays 从某个日期增加n天后的日期]
+ * @param  {[string]} dateStr  [日期字符串]
+ * @param  {[int]} dayCount [增加的天数]
+ * @return {[string]}[增加n天后的日期字符串]
+ */
+function dateAddDays(dateStr,dayCount) {
+    var tempDate=new Date(dateStr.replace(/-/g,"/"));//把日期字符串转换成日期格式
+    var resultDate=new Date((tempDate/1000+(86400*dayCount))*1000);//增加n天后的日期
+    var resultDateStr=resultDate.getFullYear()+"-"+(resultDate.getMonth()+1)+"-"+(resultDate.getDate());//将日期转化为字符串格式
+    return resultDateStr;
+}
+
+dateAddDays('2019-03-18',27); //"2019-4-14"
+```
+
+:::note
+来源：https://www.cnblogs.com/willingtolove/p/10554312.html
+:::

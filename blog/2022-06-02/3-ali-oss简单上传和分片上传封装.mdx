@@ -1,0 +1,139 @@
+---
+slug: ali-oss简单上传和分片上传封装
+title: ali-oss简单上传和分片上传封装
+authors: [yvonne]
+tags: [react,ali-oss]
+---
+
+<!--truncate-->
+```javascript title="@/plugins/ali-oss.js"
+// 引入ali-oss(没有用到)
+import axios from "@/plugins/axios";
+import moment from "moment";
+
+let OSS = require("ali-oss");
+/**
+ *  [accessKeyId] {String}：通过阿里云控制台创建的AccessKey。
+ *  [accessKeySecret] {String}：通过阿里云控制台创建的AccessSecret。
+ *  [bucket] {String}：通过控制台或PutBucket创建的bucket。
+ *  [region] {String}：bucket所在的区域，。
+ */
+let client;
+/**
+ * 生成文件名称后缀
+ */
+const getClientData = async () => {
+  let { data } = await axios.get("/common/ossali/getsts");
+  client = new OSS({
+    secure: false, // secure: 配合region使用，如果指定了secure为true，则使用HTTPS访问
+    accessKeyId: data.accesskey,
+    accessKeySecret: data.accessSecret,
+    bucket: data.bucketName,
+    stsToken: data?.stsToken,
+    region: "oss-cn-shanghai",
+    // 刷新临时访问凭证。
+    refreshSTSToken: async () => {
+      const refreshToken = await axios.get("/common/ossali/getsts");
+      return {
+        secure: false, // secure: 配合region使用，如果指定了secure为true，则使用HTTPS访问
+        accessKeyId: refreshToken.accesskey,
+        accessKeySecret: refreshToken.accessSecret,
+        bucket: refreshToken.bucketName,
+        stsToken: refreshToken?.stsToken,
+        region: "oss-cn-shanghai",
+      };
+    },
+  });
+};
+/**
+ *  上传文件，大小不能超过5GB
+ * @param {string} file 本地文件
+ * @retruns Promise
+ */
+export const put = async (file) => {
+  await getClientData();
+  let timeData = moment().format("YYYY-MM-DD");
+  let result = await client.put(`/${timeData}/${moment().format("x")}_${file.name}`, file);
+  // ObjName为文件名字,可以只写名字，就直接储存在 bucket 的根路径，如需放在文件夹下面直接在文件名前面加上文件夹名称
+  return result;
+};
+
+/* ======== 分片上传(文件大于100M使用) ======== */
+export const multipartUpload = async (file, option) => {
+  await getClientData();
+  let timeData = moment().format("YYYY-MM-DD");
+  let fileName = `${moment().format("x")}_${file.name}`;
+  try {
+    // 依次填写Object完整路径（例如exampledir/exampleobject.txt）和本地文件的完整路径（例如D:\\localpath\\examplefile.txt）。Object完整路径中不能包含Bucket名称。
+    // 如果本地文件的完整路径中未指定本地路径（例如examplefile.txt），则默认从示例程序所属项目对应本地路径中上传文件。
+    const result = await client.multipartUpload(`/${timeData}/${fileName}`, file, {
+      progress: async (p, _checkpoint) => {
+        const e = {};
+        e.percent = parseInt(p * 100);
+        option.onProgress(e);
+      },
+      partSize: 102400 * 5,
+    });
+    // 填写Object完整路径，例如exampledir/exampleobject.txt。Object完整路径中不能包含Bucket名称。
+    const head = await client.head(`transsion_saas/console/${timeData}/${fileName}`);
+    if (head.res.status === 200) {
+      return head.res.requestUrls;
+    }
+  } catch (e) {
+    // 捕获超时异常。
+    if (e.code === "ConnectionTimeoutError") {
+      // do ConnectionTimeoutError operation
+    }
+  }
+};
+```
+
+### 调用示例
+```javascript 
+import usePolling from "@/plugins/usePolling"; 
+
+ /* ========== 导入轮询 ========== */
+  const submitPublicBagPolling = useCallback(async () => {
+    let resPolling = await axios
+      .post("/progress", {
+        id: id,
+      })
+      .catch(() => {
+        setLoading(false);
+      });
+    if (!resPolling) {
+      setLoading(false);
+      return { hasFinshed: true };
+    }
+    if (resPolling.data?.finish) {
+      message.success(``);
+      setLoading(false);
+    }
+    return { hasFinshed: resPolling.data?.finish };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
+  const [doPollingType, cancelPollingType] = usePolling(submitPublicBagPolling); //接口轮询hook
+  /* ========== 导入 ========== */
+  const submitPublicBag = async (values) => {
+    if (Object.keys(values).length == 0) {
+      setPublicBagVis(false);
+      return;
+    }
+    setLoading(true);
+    let res = await axios.post("/batchsms/contact/crowdpack/submit", {
+      ...values,
+        id: id,
+    });
+    if (!res) {
+      setLoading(false);
+      return false;
+    }
+    if (res.data?.finish) {
+      message.success(``);
+      setLoading(false);
+    } else {
+      doPollingType();
+    }
+  };
+```
+ 

@@ -1,0 +1,276 @@
+---
+slug: i18n国际化配置 react
+title: i18n国际化配置 react
+authors: [yvonne]
+tags: [react,i18n]
+---
+
+<!--truncate-->
+import menu from "./20220602111757413-1126951580.png"
+
+### 文件目录
+<img src={menu} width="300" />
+
+```javascript title="index.js"
+import i18n from "i18next";
+import { initReactI18next } from "react-i18next";
+
+import LanguageDetector from "i18next-browser-languagedetector";
+import resources from "./resources";
+const langType = sessionStorage.getItem("langType");
+i18n
+  .use(LanguageDetector) //嗅探当前浏览器语言 zh-CN
+  .use(initReactI18next)
+  .init({
+    resources,
+    interpolation: {
+      escapeValue: false,
+    },
+    lng: langType,
+    debug: false,
+    // fallbackLng: "zh", //默认当前环境的语言
+    fallbackLng: ["en", "fr", "zh", "dev"],
+    detection: {
+      lookupSessionStorage: "langType",
+      caches: ["sessionStorage"],
+      order: ["sessionStorage"],
+      lookupQuerystring: "lng",
+    },
+  });
+
+export default i18n;
+```
+
+```javascript title="resources.js"
+/**
+ * 加载语言文件 配置
+ *
+ *  zh   中文
+ *  en   英文
+ */
+export default {
+  en: require("./language/en.js").default,
+  fr: require("./language/fr.js").default,
+  zh: require("./language/zh.js").default,
+};
+```
+
+```javascript title="language(en.js,zh.js,fr.js)"
+/**
+ * 英文
+ */
+const language = "en";
+export default {
+  translation: {
+    // 公共组件
+    components: require("../module/components.js").default[language],
+    // 菜单
+    menu: require("../module/menu.js").default[language]
+  },
+};
+```
+
+```javascript title="module(components.js,menu.js)"
+export default {
+  en: {
+    with: "common",
+    strip_data: "piece of data",
+  },
+  zh: {
+    with: "共",
+    strip_data: "条数据",  },
+  fr: {
+    with: "commun",
+    strip_data: " données",
+  },
+};
+```
+
+```javascript title="main.js" showLineNumbers
+import React, { Suspense, useCallback, useEffect, useState } from "react";
+import { ConfigProvider } from "antd";
+import { render } from "react-dom";
+import { Provider } from "react-redux";
+import store from "./redux";
+import { BrowserRouter, Switch, Route, Redirect } from "react-router-dom";
+// highlight-start
+import zh from "antd/lib/locale/zh_CN";
+import en from "antd/lib/locale/en_US";
+import fr from "antd/lib/locale/fr_FR";
+// highlight-end
+import PageLoad from "components/page_load";
+import moment from "moment";
+// highlight-start
+import "moment/locale/zh-cn";
+import "moment/locale/en-nz";
+import "moment/locale/fr";
+// highlight-end
+import "assets/style/style.less";
+import Layout from "pages/layout/index";
+// highlight-start
+import "./i18n/index";
+import i18n from "@/i18n/index";
+// highlight-end
+import axios from "@/plugins/axios";
+moment.locale("zh-cn");
+const originalSetItem = sessionStorage.setItem;
+sessionStorage.setItem = function (key, newValue) {
+  const setItemEvent = new Event("setItemEvent");
+  setItemEvent[key] = newValue;
+  window.dispatchEvent(setItemEvent);
+  originalSetItem.apply(this, [key, newValue]);
+};
+const App = () => {
+  const [locale, setLocale] = useState(sessionStorage.getItem("langType"));
+  const [loading, setLoading] = useState(true); //当token接口数据获取到后再进行路由渲染
+  const REDIRECT_URL = "https://";
+  const getPageQueries = (path) => {
+    const query = {};
+    path = path || window.location.href;
+    const urlObj = new URL(path);
+    const { search } = urlObj;
+
+    if (search) {
+      const arr = search.replace(/\\#\/.*\?/, "").split("&");
+      arr.forEach((item) => {
+        const [key, value] = item.replace("?", "").split("=");
+        query[key] = value;
+      });
+    }
+    return query;
+  };
+  /* ======== 获取token ======== */
+  const getToken = useCallback(async (authCode) => {
+    setLoading(true);
+    let res = await axios.post(
+      "/getToken",
+      { authCode },
+      {
+        baseURL: "/not-login/console/v1",
+      }
+    );
+    if (!res) return false;
+    sessionStorage.setItem("token", res.data?.token || "");
+    setLoading(false);
+    userInformation();
+  }, []);
+  /*========= 获取用户信息 =========*/
+  const userInformation = async () => {
+    let res = await axios.post("/get", {});
+    if (!res) return false;
+    sessionStorage.setItem("userInfo", JSON.stringify(res.data));
+  };
+  /* ======== 设置localStorge监听语言是否变化 ======== */
+  useEffect(() => {
+    const getLangType = (e) => {
+      e?.langType && setLocale(e.langType);
+    };
+    window.addEventListener("setItemEvent", getLangType);
+    return () => {
+      window.removeEventListener("setItemEvent", getLangType);
+    };
+  }, []);
+  /* ======== 获取路由里面的authCode和lan ======== */
+  useEffect(() => {
+    let token = sessionStorage.getItem("token");
+    let obj = getPageQueries(window.location);
+    i18n.changeLanguage(obj.lan);
+    if (obj?.authCode) {
+      // sessionStorage.setItem("authCode", obj.authCode);
+      getToken(obj?.authCode);
+    } else if (token) {
+      setLoading(false);
+    }
+  }, [getToken]);
+  return (
+    // highlight-next-line
+    <ConfigProvider locale={locale === "zh" ? zh : locale === "fr" ? fr : en}>
+      <Provider store={store}>
+        <Suspense fallback={<PageLoad />}>
+          {!loading ? (
+            <BrowserRouter basename="/">
+              <Switch>
+                {/* <Layout /> */}
+                <Route
+                  path="/"
+                  render={({ location }) => {
+                    let token = sessionStorage.getItem("token");
+                    return token ? (
+                      <Layout />
+                    ) : (
+                      <Route
+                        component={() => {
+                          window.location.href = `${REDIRECT_URL}`;
+                          return null;
+                        }}
+                      />
+                    );
+                  }}
+                />
+              </Switch>
+            </BrowserRouter>
+          ) : (
+            <PageLoad />
+          )}
+        </Suspense>
+      </Provider>
+    </ConfigProvider>
+  );
+};
+
+render(<App />, document.getElementById("app"));
+```
+
+### 调用示例
+```javascript 
+import { useTranslation } from "react-i18next";
+export default () => {
+  const { t } = useTranslation();
+  return{
+        <p>{t("components.with")}</p>
+  }
+}
+
+
+import i18next from "i18next";
+export const getMaketTypeName = (val) => {
+  switch (val) {
+    case "12":
+      return i18next.t("components.with");
+    default:
+      return "";
+  }
+};
+```
+
+### 修改语言
+```javascript
+import React, { useContext, useMemo, useState, useEffect } from "react";
+
+import { useTranslation } from "react-i18next";
+import i18n from "@/i18n/index";
+export default () => {
+  const { t } = useTranslation();
+  const [language, setLanguage] = useState("zh");
+
+  const changeLanguage = (value) => {
+    setLanguage(value);
+    i18n.changeLanguage(value);
+  };
+  useEffect(() => {
+    let type = sessionStorage.getItem("langType");
+    if (type) {
+      setLanguage(type);
+    } else {
+      //如果被清空了 那么当前语言会被设置为默认语言 zh
+    }
+  }, []);
+  return (
+              <Select value={language} onChange={(value) => changeLanguage(value)} style={{ width: 100 }}>
+                <Select.Option value="zh">中文</Select.Option>
+                <Select.Option value="en">English</Select.Option>
+                <Select.Option value="fr">Français</Select.Option>
+              </Select>
+  );
+};
+```

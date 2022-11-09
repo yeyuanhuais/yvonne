@@ -1,0 +1,93 @@
+---
+slug: axios封装
+title: axios封装
+authors: [yvonne]
+tags: [axios]
+---
+<!--truncate-->
+
+```javascript title="@/plugins/axios.js"
+import axios from "axios";
+import { Modal, message } from "antd";
+import i18next from "i18next";
+const { CancelToken } = axios;
+const cancelTokenArr = {};
+
+const _axios = axios.create({
+  baseURL: "/console/v1",
+});
+
+_axios.interceptors.request.use(
+  (config) => {
+    const token = sessionStorage.getItem("token");
+    if (token) {
+      config.headers["token"] = token;
+    }
+    if (config.cancel) {
+      config.cancelToken = new CancelToken((c) => {
+        cancelTokenArr[config.cancel] = c;
+      });
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+_axios.interceptors.response.use(
+  (response) => {
+    const res = response.data;
+    if (res instanceof Blob) {
+      return response;
+    } else if ( res.code == "000401") {
+      sessionStorage.removeItem("token");
+      message.destroy();
+      Modal.destroyAll();
+      Modal.warning({
+        title: "登录过期",
+        content: "登录状态失效，请重新登录",
+        onOk() {
+          location.href = "";
+        },
+      });
+    } else if (res.code !== "000000") {
+      message.error(res?.message);
+    } else {
+      return res;
+    }
+  },
+  (error) => {
+    const res = error.response;
+    if (res?.status && (res?.status === 403 || res?.status === 401)) {
+       return {
+         status: "000403",
+         message: "验签不通过！请重新登录",
+       };
+    } else {
+      message.error(res?.data?.error_msg );
+      return Promise.reject(res?.data);
+    }
+  }
+);
+
+_axios.cancelAjax = (name, msg) => {
+  if (cancelTokenArr[name]) {
+    cancelTokenArr[name](msg || "强制中断了请求");
+    cancelTokenArr[name] = null;
+  }
+};
+
+export default _axios;
+```
+
+### 调用示例
+```javascript 
+import axios from "@/plugins/axios"; 
+
+axios.get("url",{param:{a:"1"}}).then(()=>{
+}).catch(()=>{}).finally(()=>{});
+axios.post("url",{a:"1"}).then(()=>{
+}).catch(()=>{}).finally(()=>{});
+```
+ 

@@ -1,0 +1,93 @@
+---
+slug: react hook 接口轮询
+title: react hook 接口轮询
+authors: [yvonne]
+tags: [react,hook]
+---
+
+<!--truncate-->
+```javascript title="@/plugins/usePolling.js"
+import { useCallback, useRef, useEffect } from "react";
+const sleep = (time) => {
+  return new Promise((resolve) => setTimeout(resolve, time));
+};
+const useUnMount = (fn) => {
+  useEffect(
+    () => () => {
+      fn();
+    },
+    [fn]
+  );
+};
+
+const usePolling = (polling) => {
+  const isPollingRef = useRef(false);
+  const cancelRef = useRef(false);
+
+  const doPolling = useCallback(() => {
+    // 是否正在轮询，是，返回，不能多个接口同时轮询，避免这些接口有先后顺序相互影响
+    if (isPollingRef.current) {
+      return;
+    }
+    isPollingRef.current = true;
+
+    const pollNext = async () => {
+      // 如果掉了取消轮询，那么就返回不执行
+      if (cancelRef.current) {
+        isPollingRef.current = false;
+        cancelRef.current = false;
+        return;
+      }
+      // 发送请求，返回值组装一下，给个 hasFinshed 判断是否还要继续轮询
+      const { hasFinshed } = await polling();
+
+      if (!hasFinshed) {
+        await sleep(3000);
+        pollNext();
+      } else {
+        isPollingRef.current = false;
+      }
+    };
+
+    pollNext();
+  }, [polling]);
+
+  const cancelPolling = useCallback(() => {
+    if (isPollingRef.current) {
+      cancelRef.current = true;
+    }
+  }, []);
+
+  useUnMount(cancelPolling);
+
+  return [doPolling, cancelPolling];
+};
+
+export default usePolling;
+```
+
+### 调用示例
+```javascript 
+import { put, multipartUpload } from "@/plugins/ali-oss";
+
+  /* ======== 自定义上传 ======== */
+  const customRequest = async (info) => {
+    if (info.file.size / 1024 / 1024 <= 100) {
+      setLoadNum(1);
+      let res = await put(info.file);
+      setLoadNum(100);
+      onChange?.(res?.url);
+    } else {
+      let res = await multipartUpload(info.file, {
+        onProgress: (e) => {
+          setLoadNum(e.percent);
+        },
+      });
+      onChange?.(res[0]);
+    }
+  };
+```
+
+:::note
+参考：https://juejin.cn/post/7085174569484582925
+:::

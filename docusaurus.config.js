@@ -76,9 +76,11 @@ const config = {
             position: "right",
           },
           {
-            href: "https://github.com/yyh28",
-            label: "GitHub",
+            href: "https://github.com/yyh28/yvonne",
             position: "right",
+            label: "GitHub",
+            className: "navbar-github-link",
+            "aria-label": "GitHub repository",
           },
         ],
       },

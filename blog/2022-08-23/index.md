@@ -4,7 +4,7 @@ title: react-router-dom v6 路由参数
 authors: [yvonne]
 tags: [react,react-router-dom v6]
 ---
-
+<!--truncate-->
 ## 1. 通过state传参(HashRouter会丢失，BrowserRouter不会丢失)
 
 传参页面
