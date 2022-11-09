@@ -21,3 +21,8 @@
   align-items: center;
   justify-content: center;
 }
+.hero__title{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
