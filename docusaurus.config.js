@@ -13,6 +13,7 @@ const config = {
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
   favicon: "img/favicon.ico",
+  baseUrlIssueBanner:false,
 
   presets: [
     [
@@ -34,6 +35,10 @@ const config = {
         gtag: {
           trackingID: "G-2LT0QGRDB3",
           anonymizeIP: true,
+        },
+        sitemap: {
+            changefreq: 'weekly',
+            priority: 0.5,
         },
       }),
     ],
@@ -118,6 +123,12 @@ const config = {
 
         // ……其他 Algolia 参数
       },
+      metadata: [
+        {
+            name: 'keywords',
+            content: 'yvonne'
+        }
+    ],
     }),
 };
 
