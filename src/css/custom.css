@@ -74,3 +74,31 @@
   display: flex;
   justify-content: space-between;
 }
+
+
+/* Icon List */
+.header-github-link:hover,
+.header-share-link:hover,
+.header-discord-link:hover,
+.header-nanos-link:hover {
+  opacity: 0.6;
+}
+
+.header-github-link:before,
+.header-share-link:before,
+.header-discord-link:before,
+.header-nanos-link:before {
+  content: '';
+  display: flex;
+  width: 30px;
+  height: 30px;
+}
+
+/* Github */
+.header-github-link:before {
+  background: no-repeat center/24px url("/img/github-black.svg");
+}
+
+html[data-theme='dark'] .header-github-link:before {
+  background: no-repeat center/24px url("/img/github-white.svg");
+}

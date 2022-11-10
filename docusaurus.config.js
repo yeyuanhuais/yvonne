@@ -13,7 +13,7 @@ const config = {
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
   favicon: "img/favicon.ico",
-  baseUrlIssueBanner:false,
+  baseUrlIssueBanner: false,
 
   presets: [
     [
@@ -37,8 +37,8 @@ const config = {
           anonymizeIP: true,
         },
         sitemap: {
-            changefreq: 'weekly',
-            priority: 0.5,
+          changefreq: "weekly",
+          priority: 0.5,
         },
       }),
     ],
@@ -87,9 +87,8 @@ const config = {
           {
             href: "https://github.com/yyh28/yvonne",
             position: "right",
-            label: "GitHub",
-            className: "navbar-github-link",
-            "aria-label": "GitHub repository",
+            // label: "GitHub",
+            className: 'header-github-link','aria-label': 'GitHub repository',
           },
         ],
       },
@@ -125,10 +124,16 @@ const config = {
       },
       metadata: [
         {
-            name: 'keywords',
-            content: 'yvonne'
-        }
-    ],
+          name: "keywords",
+          content: "yvonne",
+        },
+      ],
+      giscus: {
+        repo: "yyh28/yvonne",
+        repoId: "R_kgDOIMlR-Q",
+        category: "Announcements",
+        categoryId: "DIC_kwDOIMlR-c4CSeJx",
+      },
     }),
 };
 
