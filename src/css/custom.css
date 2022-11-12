@@ -5,7 +5,7 @@
  */
 
 /* You can override the default Infima variables here. */
-@import url('https://cdn.jsdelivr.net/npm/tailwindcss@2.2.0/dist/tailwind.min.css');
+@import url("https://cdn.jsdelivr.net/npm/tailwindcss@2.2.0/dist/tailwind.min.css");
 :root {
   --ifm-color-primary: #2e8555;
   --ifm-color-primary-dark: #29784c;
@@ -19,7 +19,7 @@
 }
 
 /* For readability concerns, you should choose a lighter palette in dark mode. */
-[data-theme='dark'] {
+[data-theme="dark"] {
   --ifm-color-primary: #25c2a0;
   --ifm-color-primary-dark: #21af90;
   --ifm-color-primary-darker: #1fa588;
@@ -30,7 +30,7 @@
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 }
 
-[data-theme='light'] .DocSearch {
+[data-theme="light"] .DocSearch {
   /* --docsearch-primary-color: var(--ifm-color-primary); */
   /* --docsearch-text-color: var(--ifm-font-color-base); */
   --docsearch-muted-color: var(--ifm-color-secondary-darkest);
@@ -48,7 +48,7 @@
   --docsearch-footer-background: var(--ifm-color-white);
 }
 
-[data-theme='dark'] .DocSearch {
+[data-theme="dark"] .DocSearch {
   --docsearch-text-color: var(--ifm-font-color-base);
   --docsearch-muted-color: var(--ifm-color-secondary-darkest);
   --docsearch-container-background: rgba(47, 55, 69, 0.7);
@@ -63,18 +63,13 @@
   --docsearch-hit-background: var(--ifm-color-emphasis-100);
   /* 页脚 */
   --docsearch-footer-background: var(--ifm-background-surface-color);
-  --docsearch-key-gradient: linear-gradient(
-    -26.5deg,
-    var(--ifm-color-emphasis-200) 0%,
-    var(--ifm-color-emphasis-100) 100%
-  );
+  --docsearch-key-gradient: linear-gradient(-26.5deg, var(--ifm-color-emphasis-200) 0%, var(--ifm-color-emphasis-100) 100%);
 }
 
-.flex_space_between{
+.flex_space_between {
   display: flex;
   justify-content: space-between;
 }
-
 
 /* Icon List */
 .header-github-link:hover,
@@ -88,7 +83,7 @@
 .header-share-link:before,
 .header-discord-link:before,
 .header-nanos-link:before {
-  content: '';
+  content: "";
   display: flex;
   width: 30px;
   height: 30px;
@@ -99,6 +94,10 @@
   background: no-repeat center/24px url("/img/github-black.svg");
 }
 
-html[data-theme='dark'] .header-github-link:before {
+html[data-theme="dark"] .header-github-link:before {
   background: no-repeat center/24px url("/img/github-white.svg");
+}
+
+ol {
+  list-style-type: auto;
 }
