@@ -1,0 +1,9 @@
+{
+  "markdown.preview.typographer": false,
+  "markdown.trace.server": "messages",
+  "markdown.validate.enabled": true,
+  "markdown.preview.breaks": true,
+  "markdown.extension.list.indentationSize": "inherit",
+  "markdown.extension.tableFormatter.normalizeIndentation": true,
+  "markdown.extension.toc.orderedList": true
+}
