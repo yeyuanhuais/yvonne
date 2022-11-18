@@ -1,4 +1,10 @@
 工作中常用的指令
 
-## 将一个分支合并到另一个分支
+## 查看本地分支基于哪个分支创建
+使用项目目录下使用Git Bash
+
+```git
+# 查看merge和checkout记录
+git reflog show --date=local | grep 分支名
+````
 
