@@ -101,3 +101,6 @@ html[data-theme="dark"] .header-github-link:before {
 ol {
   list-style-type: auto;
 }
+ul {
+  list-style: circle;
+}

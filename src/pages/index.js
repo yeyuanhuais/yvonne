@@ -19,7 +19,7 @@ function HomepageHeader() {
         <p className="hero__subtitle">前端：</p>
         <p className="hero__subtitle">后端：</p>
         <p className="hero__subtitle">运维：docker、git</p>
-        <p className="hero__subtitle">其他：信息系统项目管理师、mermaid使用、markmap使用、docusaurus使用</p>
+        <p className="hero__subtitle">其他：信息系统项目管理师知识点总结、mermaid使用、markmap使用、docusaurus使用</p>
       </div>
     </header>
   );
