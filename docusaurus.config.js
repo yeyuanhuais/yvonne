@@ -124,7 +124,7 @@ const config = {
       metadata: [
         {
           name: "keywords",
-          content: "yvonne",
+          content: "yvonne,信息系统项目管理师知识点总结,mermaid使用,markmap使用",
         },
       ],
       giscus: {
