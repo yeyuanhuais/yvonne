@@ -1,0 +1,31 @@
+---
+slug: 强制删除nvm版本
+title: 强制删除nvm版本
+authors: [yvonne]
+tags: [nvm,node]
+---
+<!--truncate-->
+
+### 强制删除使用nvm安装的node版本
+window用户：
+
+使用管理员模式打开终端
+
+```
+cd C:\Users\137\AppData\Roaming\nvm
+
+RD /S v15.8.0
+```
+
+### nvm命令使用
+
+```js
+nvm list  //查看nvm列表和当前node版本
+
+nvm use 16.14.2  //切换node版本
+
+nvm install 16.14.2  //nvm安装node版本
+
+nvm uninstall 16.14.2  //nvm卸载node版本
+
+```
