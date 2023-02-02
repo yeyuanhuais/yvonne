@@ -71,7 +71,7 @@ const config = {
         items: [
           {
             type: "doc",
-            docId: "frontend/介绍",
+            docId: "frontend/介绍.mdx",
             position: "left",
             label: "前端",
           },
