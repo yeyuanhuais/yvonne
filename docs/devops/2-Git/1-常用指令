@@ -8,3 +8,40 @@
 git reflog show --date=local | grep 分支名
 ````
 
+```git
+# 新建一个分支并同时切换到那个分支上
+$ git checkout -b iss53
+# 等同于
+$ git branch iss53
+$ git checkout iss53
+````
+
+```git
+# 切换到分支
+$ git checkout master
+````
+
+```git
+# 将 hotfix 分支合并回你的 master 分支来部署到线上
+$ git checkout master
+$ git merge hotfix
+````
+
+```git
+# 删除分支
+$ git branch -d hotfix
+````
+
+
+
+
+
+
+
+
+
+
+
+
+
+
