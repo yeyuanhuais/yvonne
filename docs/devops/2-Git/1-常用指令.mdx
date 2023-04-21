@@ -1,0 +1,56 @@
+工作中常用的指令
+
+## 查看本地分支基于哪个分支创建
+使用项目目录下使用Git Bash
+
+```git
+# 查看merge和checkout记录
+git reflog show --date=local | grep 分支名
+````
+
+```git
+# 新建一个分支并同时切换到那个分支上
+$ git checkout -b iss53
+# 等同于
+$ git branch iss53
+$ git checkout iss53
+````
+
+```git
+# 切换到分支
+$ git checkout master
+````
+
+```git
+# 将 hotfix 分支合并回你的 master 分支来部署到线上
+$ git checkout master
+$ git merge hotfix
+````
+
+```git
+# 删除分支
+$ git branch -d hotfix
+```
+
+## 对于频繁修改某个文件，但又不想把修改的内容提交到git上，一般是通过把某些目录或文件加入.gitignore忽略规则，但有些文件按照上述方法定义后发现并未生效
+
+原因是.gitignore只能忽略那些原来没有被追踪的文件，如果某些文件已经被纳入了版本管理中，则修改.gitignore是无效的。
+
+那么解决方法就是先把本地缓存删除（改变成未被追踪状态），然后再提交，这样就不会出现忽略的文件了。
+
+```git
+# git清除本地缓存命令如下：
+$ git rm .env.development --cached
+```
+
+
+
+
+
+
+
+
+
+
+
+
