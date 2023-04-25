@@ -134,6 +134,17 @@ const config = {
             footer: {
                 style: "dark",
                 copyright: `Copyright © 2022-${new Date().getFullYear()} 闽ICP备2021014833号-1`,
+                links: [
+                    {
+                        title: "",
+                        items: [
+                            {
+                                label: "闽ICP备2021014833号-1",
+                                href: "https://beian.miit.gov.cn/",
+                            },
+                        ],
+                    },
+                ],
             },
             prism: {
                 theme: lightCodeTheme,
