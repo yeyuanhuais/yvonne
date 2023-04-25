@@ -133,7 +133,7 @@ const config = {
             },
             footer: {
                 style: "dark",
-                copyright: `Copyright © 2022-${new Date().getFullYear()} 闽ICP备2021014833号`,
+                copyright: `Copyright © 2022-${new Date().getFullYear()} 闽ICP备2021014833号-1`,
             },
             prism: {
                 theme: lightCodeTheme,
