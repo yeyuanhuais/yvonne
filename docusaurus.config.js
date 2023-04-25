@@ -133,14 +133,17 @@ const config = {
             },
             footer: {
                 style: "dark",
-                copyright: `Copyright © 2022-${new Date().getFullYear()} 闽ICP备2021014833号-1`,
+                // copyright: `Copyright © 2022-${new Date().getFullYear()} 闽ICP备2021014833号-1`,
                 links: [
                     {
-                        title: "",
+                        title: "备案",
                         items: [
                             {
-                                label: "闽ICP备2021014833号-1",
-                                href: "https://beian.miit.gov.cn/",
+                                html: `
+                                    <a href="https://beian.miit.gov.cn/" target="_blank" rel="noreferrer noopener" aria-label="Deploys by Netlify">
+                                      <span >Copyright © 2022-${new Date().getFullYear()} 闽ICP备2021014833号-1</span>
+                                    </a>
+                                  `,
                             },
                         ],
                     },
