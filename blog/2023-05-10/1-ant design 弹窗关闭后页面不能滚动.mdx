@@ -1,0 +1,23 @@
+---
+slug: ant design 弹窗关闭后页面不能滚动
+title: ant design 弹窗关闭后页面不能滚动
+authors: [yvonne]
+tags: [antd]
+---
+<!--truncate-->
+ant design 弹窗关闭后页面不能滚动！
+问题描述：
+在使用modal弹窗时候，关闭后导致页面无法滚动，检查后发现是body上设置了样式 overflow:hidden 导致不可滚动。
+
+解决思路：
+1、手动设置overflow为auto 2、单独的样式覆盖
+
+峰回路转：
+经过搜索后，问题就出在抽屉drawer，默认情况drawer直接挂在body上面的，有一个getContainer属性可以改变挂载节点。
+
+最终解决方案：
+:get-container="false"
+
+————————————————
+版权声明：本文为CSDN博主「执行上下文」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
+原文链接：https://blog.csdn.net/qq_17481731/article/details/128617969
