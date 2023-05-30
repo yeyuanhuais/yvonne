@@ -5,5 +5,8 @@
   "markdown.preview.breaks": true,
   "markdown.extension.list.indentationSize": "inherit",
   "markdown.extension.tableFormatter.normalizeIndentation": true,
-  "markdown.extension.toc.orderedList": true
+  "markdown.extension.toc.orderedList": true,
+  "cSpell.words": [
+    "SWEBOK"
+  ]
 }

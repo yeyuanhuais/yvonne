@@ -133,7 +133,7 @@ const config = {
             },
             footer: {
                 style: "dark",
-                copyright: `Copyright © 2022-${new Date().getFullYear()} <a href="https://beian.miit.gov.cn/" target="_blank" rel="noreferrer noopener" aria-label="Deploys by Netlify" style={color:white}>闽ICP备2021014833号-1</a>`,
+                copyright: `Copyright © 2022-${new Date().getFullYear()} <a href="https://beian.miit.gov.cn/" target="_blank" rel="noreferrer noopener" aria-label="Deploys by Netlify" style={color:white}>闽ICP备2021014833号-1</a> <p>转载本网站内容需标注来源</p>`,
             },
             prism: {
                 theme: lightCodeTheme,
