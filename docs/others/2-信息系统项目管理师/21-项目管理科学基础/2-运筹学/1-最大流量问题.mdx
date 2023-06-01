@@ -1,0 +1,43 @@
+1. 找出从起点到终点存在的所有可能路径
+2. 计算每条路径的最大流量值（各条路径上的最大流量应是其各段流量的最小值），然后将这些值汇总
+
+在最大流量的计算中可能会出现有向运输和无向运输的问题  
+1. 有向运输就是节点与节点之间的流向是有方向的，只能从节点A流向节点B或者只能从节点B流向节点A  
+2. 无向运输就是节点A可以流向节点B，也可以节点B流向节点A
+3. <Highlight>总的最大流量应是各条路径上的最大流量之和，每条路径上的最大流量应是其各段流量的最小值</Highlight>
+
+例题一：<img src={require("./_images/Snipaste_2023-06-01_14-47-48.png").default} />
+
+
+<div class="rowDiv">
+  <div class="col-12">
+1. 将表中的数据标记到图上
+<img src={require("./_images/Snipaste_2023-06-01_15-01-47.png").default}  width = "300" height = "200"/>
+  </div>
+  <div class="col-12">
+2. 路径 1-3-5-6 的最大流量是10，该路径上各段流量应该都减少10，1-3之间断开
+<img src={require("./_images/Snipaste_2023-06-01_15-24-57.png").default}  width = "300" height = "200"/>
+  </div>
+  <div class="col-12">
+3. 路径 1-2-5-6 的最大流量是6，该路径上各段流量应该都减少6，1-2之间断开
+<img src={require("./_images/Snipaste_2023-06-01_15-26-06.png").default}  width = "300" height = "200"/>
+  </div>
+  <div class="col-12">
+4. 路径 1-4-6 的最大流量是5，该路径上各段流量应该都减少5，4-6之间断开
+<img src={require("./_images/Snipaste_2023-06-01_15-27-02.png").default}  width = "300" height = "200"/>
+  </div>
+  <div class="col-12">
+5. 路径 1-4-3-5-6 的最大流量是1，该路径上各段流量应该都减少1，3-4之间断开
+<img src={require("./_images/Snipaste_2023-06-01_15-29-11.png").default}  width = "300" height = "200"/>
+  </div>
+  <div class="col-12">
+6. 路径 1-4-2-5-6 的最大流量是1，该路径上各段流量应该都减少1，2-5之间断开
+<img src={require("./_images/Snipaste_2023-06-01_15-30-06.png").default}  width = "300" height = "200"/>
+  </div>
+  <div class="col-12">
+7. 从节点 1-6 已经没有可通的路径，因此最大流量应该是所有可能运输路径上的最大流量之和，10+6+5+1+1=23 万吨
+  </div>
+</div>  
+
+
+例题二：<img src={require("./_images/Snipaste_2023-06-01_15-47-18.png").default} />

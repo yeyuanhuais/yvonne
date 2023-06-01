@@ -7,68 +7,72 @@
 /* You can override the default Infima variables here. */
 @import url("https://cdn.jsdelivr.net/npm/tailwindcss@2.2.0/dist/tailwind.min.css");
 :root {
-  --ifm-color-primary: #2e8555;
-  --ifm-color-primary-dark: #29784c;
-  --ifm-color-primary-darker: #277148;
-  --ifm-color-primary-darkest: #205d3b;
-  --ifm-color-primary-light: #33925d;
-  --ifm-color-primary-lighter: #359962;
-  --ifm-color-primary-lightest: #3cad6e;
-  --ifm-code-font-size: 95%;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+    --ifm-color-primary: #2e8555;
+    --ifm-color-primary-dark: #29784c;
+    --ifm-color-primary-darker: #277148;
+    --ifm-color-primary-darkest: #205d3b;
+    --ifm-color-primary-light: #33925d;
+    --ifm-color-primary-lighter: #359962;
+    --ifm-color-primary-lightest: #3cad6e;
+    --ifm-code-font-size: 95%;
+    --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
 }
 
 /* For readability concerns, you should choose a lighter palette in dark mode. */
 [data-theme="dark"] {
-  --ifm-color-primary: #25c2a0;
-  --ifm-color-primary-dark: #21af90;
-  --ifm-color-primary-darker: #1fa588;
-  --ifm-color-primary-darkest: #1a8870;
-  --ifm-color-primary-light: #29d5b0;
-  --ifm-color-primary-lighter: #32d8b4;
-  --ifm-color-primary-lightest: #4fddbf;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+    --ifm-color-primary: #25c2a0;
+    --ifm-color-primary-dark: #21af90;
+    --ifm-color-primary-darker: #1fa588;
+    --ifm-color-primary-darkest: #1a8870;
+    --ifm-color-primary-light: #29d5b0;
+    --ifm-color-primary-lighter: #32d8b4;
+    --ifm-color-primary-lightest: #4fddbf;
+    --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 }
 
 [data-theme="light"] .DocSearch {
-  /* --docsearch-primary-color: var(--ifm-color-primary); */
-  /* --docsearch-text-color: var(--ifm-font-color-base); */
-  --docsearch-muted-color: var(--ifm-color-secondary-darkest);
-  --docsearch-container-background: rgba(94, 100, 112, 0.7);
-  /* 弹窗 */
-  --docsearch-modal-background: var(--ifm-color-secondary-lighter);
-  /* 搜索框 */
-  --docsearch-searchbox-background: var(--ifm-color-secondary);
-  --docsearch-searchbox-focus-background: var(--ifm-color-white);
-  /* 条目 */
-  --docsearch-hit-color: var(--ifm-font-color-base);
-  --docsearch-hit-active-color: var(--ifm-color-white);
-  --docsearch-hit-background: var(--ifm-color-white);
-  /* 页脚 */
-  --docsearch-footer-background: var(--ifm-color-white);
+    /* --docsearch-primary-color: var(--ifm-color-primary); */
+    /* --docsearch-text-color: var(--ifm-font-color-base); */
+    --docsearch-muted-color: var(--ifm-color-secondary-darkest);
+    --docsearch-container-background: rgba(94, 100, 112, 0.7);
+    /* 弹窗 */
+    --docsearch-modal-background: var(--ifm-color-secondary-lighter);
+    /* 搜索框 */
+    --docsearch-searchbox-background: var(--ifm-color-secondary);
+    --docsearch-searchbox-focus-background: var(--ifm-color-white);
+    /* 条目 */
+    --docsearch-hit-color: var(--ifm-font-color-base);
+    --docsearch-hit-active-color: var(--ifm-color-white);
+    --docsearch-hit-background: var(--ifm-color-white);
+    /* 页脚 */
+    --docsearch-footer-background: var(--ifm-color-white);
 }
 
 [data-theme="dark"] .DocSearch {
-  --docsearch-text-color: var(--ifm-font-color-base);
-  --docsearch-muted-color: var(--ifm-color-secondary-darkest);
-  --docsearch-container-background: rgba(47, 55, 69, 0.7);
-  /* 弹窗 */
-  --docsearch-modal-background: var(--ifm-background-color);
-  /* 搜索框 */
-  --docsearch-searchbox-background: var(--ifm-background-color);
-  --docsearch-searchbox-focus-background: var(--ifm-color-black);
-  /* 条目 */
-  --docsearch-hit-color: var(--ifm-font-color-base);
-  --docsearch-hit-active-color: var(--ifm-color-white);
-  --docsearch-hit-background: var(--ifm-color-emphasis-100);
-  /* 页脚 */
-  --docsearch-footer-background: var(--ifm-background-surface-color);
-  --docsearch-key-gradient: linear-gradient(-26.5deg, var(--ifm-color-emphasis-200) 0%, var(--ifm-color-emphasis-100) 100%);
+    --docsearch-text-color: var(--ifm-font-color-base);
+    --docsearch-muted-color: var(--ifm-color-secondary-darkest);
+    --docsearch-container-background: rgba(47, 55, 69, 0.7);
+    /* 弹窗 */
+    --docsearch-modal-background: var(--ifm-background-color);
+    /* 搜索框 */
+    --docsearch-searchbox-background: var(--ifm-background-color);
+    --docsearch-searchbox-focus-background: var(--ifm-color-black);
+    /* 条目 */
+    --docsearch-hit-color: var(--ifm-font-color-base);
+    --docsearch-hit-active-color: var(--ifm-color-white);
+    --docsearch-hit-background: var(--ifm-color-emphasis-100);
+    /* 页脚 */
+    --docsearch-footer-background: var(--ifm-background-surface-color);
+    --docsearch-key-gradient: linear-gradient(
+        -26.5deg,
+        var(--ifm-color-emphasis-200) 0%,
+        var(--ifm-color-emphasis-100) 100%
+    );
 }
 
 .flex_space_between {
-  display: flex;
-  justify-content: space-between;
+    display: flex;
+    justify-content: space-between;
 }
 
 /* Icon List */
@@ -76,31 +80,51 @@
 .header-share-link:hover,
 .header-discord-link:hover,
 .header-nanos-link:hover {
-  opacity: 0.6;
+    opacity: 0.6;
 }
 
 .header-github-link:before,
 .header-share-link:before,
 .header-discord-link:before,
 .header-nanos-link:before {
-  content: "";
-  display: flex;
-  width: 30px;
-  height: 30px;
+    content: "";
+    display: flex;
+    width: 30px;
+    height: 30px;
 }
 
 /* Github */
 .header-github-link:before {
-  background: no-repeat center/24px url("/img/github-black.svg");
+    background: no-repeat center/24px url("/img/github-black.svg");
 }
 
 html[data-theme="dark"] .header-github-link:before {
-  background: no-repeat center/24px url("/img/github-white.svg");
+    background: no-repeat center/24px url("/img/github-white.svg");
 }
 
 ol {
-  list-style-type: auto;
+    list-style-type: auto;
 }
 ul {
-  list-style-type: circle;
+    list-style-type: circle;
+}
+.rowDiv {
+    display: flex;
+    flex-flow: row wrap;
+    min-width: 0;
+    width: 100%;
+    padding: 15px;
+}
+.rowDiv .col-6 {
+    display: block;
+    flex: 0 0 25%;
+    max-width: 25%;
+    padding: 0 10px;
+}
+
+.rowDiv .col-12 {
+    display: block;
+    flex: 0 0 50%;
+    max-width: 50%;
+    padding: 0 10px;
 }
