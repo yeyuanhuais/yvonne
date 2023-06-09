@@ -128,3 +128,10 @@ ul {
     max-width: 50%;
     padding: 0 10px;
 }
+div.tableTwo + table td {
+    width: 50%;
+}
+
+div.tableTwo + table th {
+    width: 50%;
+}
