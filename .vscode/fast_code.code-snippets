@@ -1,21 +1,51 @@
-
 {
-	"备注模板": {
-		"prefix": "note",
-		"body": [
-			":::note",
-			"$1",
-			":::",
-		],
-		"description": "备注模板"
-	},
-	"提示模板": {
-		"prefix": "tip",
-		"body": [
-			":::tip",
-			"$1",
-			":::",
-		],
-		"description": "提示模板"
-	}
+    "备注模板": {
+        "prefix": "note",
+        "body": [
+            ":::note",
+            "$1",
+            ":::",
+        ],
+        "description": "备注模板"
+    },
+    "提示模板": {
+        "prefix": "tip",
+        "body": [
+            ":::tip",
+            "$1",
+            ":::",
+        ],
+        "description": "提示模板"
+    },
+    "Highlight": {
+        "prefix": "Highlight",
+        "body": [
+            " <Highlight>$TM_SELECTED_TEXT$1</Highlight> "
+        ],
+        "description": "高亮标签"
+    },
+    "Underline": {
+        "prefix": "Underline",
+        "body": [
+            " <u>$TM_SELECTED_TEXT$1</u> "
+        ],
+        "description": "下划线"
+    },
 }
+// 键盘快捷键
+// {
+//     "key": "ctrl+alt+h",
+//     "command": "editor.action.insertSnippet",
+//     "args": {
+//       "name": "Highlight"
+//     },
+//     "when": "editorTextFocus && !editorReadonly"
+//   },
+//   {
+//     "key": "ctrl+alt+u",
+//     "command": "editor.action.insertSnippet",
+//     "args": {
+//       "name": "Underline"
+//     },
+//     "when": "editorTextFocus && !editorReadonly"
+//   },
