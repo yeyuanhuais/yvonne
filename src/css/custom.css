@@ -108,6 +108,9 @@ ol {
 ul {
     list-style-type: circle;
 }
+img + p {
+    margin-top: 10px;
+}
 .rowDiv {
     display: flex;
     flex-flow: row wrap;
