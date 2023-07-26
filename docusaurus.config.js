@@ -142,8 +142,8 @@ const config = {
             algolia: {
                 // Algolia 提供的应用 ID
                 appId: "B42DC87VTC",
-                //  公开 API 密钥：提交它没有危险
-                apiKey: "9c364221f560a69f6d289b212bdee85f",
+                //  公开 API 密钥：提交它没有危险 Search-Only API Key
+                apiKey: "a741b6c62db0cdd537d63f6ac4e48251",
                 indexName: "yyh28.top",
                 // 可选：见下文
                 contextualSearch: true,
