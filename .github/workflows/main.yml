@@ -31,10 +31,10 @@ jobs:
           source: "./build/"
           target: "/Runtime/yvonne/"
       - name: Run scraper
-          env:
+        env:
           APPLICATION_ID: ${{ secrets.APPLICATION_ID }}
           API_KEY: ${{ secrets.API_KEY }}
-          run: |
+        run: |
           CONFIG="$(cat docsearch.json)"
           docker run -i --rm \
             -e APPLICATION_ID=$APPLICATION_ID \
