@@ -159,7 +159,7 @@ const config = {
                 {
                     name: "keywords",
                     content:
-                        "yvonne,信息系统项目管理师知识点总结,mermaid使用,markmap使用",
+                        "yvonne, 信息系统项目管理师知识点总结, mermaid使用, markmap使用, 前端面试题",
                 },
             ],
             giscus: {
