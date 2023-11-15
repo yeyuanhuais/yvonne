@@ -138,6 +138,7 @@ const config = {
             prism: {
                 theme: lightCodeTheme,
                 darkTheme: darkCodeTheme,
+                additionalLanguages: ["powershell"],
             },
             algolia: {
                 // Algolia 提供的应用 ID
