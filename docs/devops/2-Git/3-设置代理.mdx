@@ -1,5 +1,5 @@
 ### GIT设置代理
-如果使用 socks5，本地 ip 和端口是 127.0.0.1:1080
+如果使用 http，本地 ip 和端口是 127.0.0.1:1080
 
 1) 仅设置github代理：
 这个只设置了github的git服务走代理通道，不会对国内仓库gitee使用代理。
@@ -7,9 +7,12 @@
 ```js
 git config --global http.https://github.com.proxy http://127.0.0.1:7890
 git config --global https.https://github.com.proxy http://127.0.0.1:7890
-#取消设置的代理
+//取消设置的代理
 git config --global --unset http.https://github.com.proxy
 git config --global --unset https.https://github.com.proxy
+//查看代理
+git config --global --get http.https://github.com.proxy
+git config --global --get https.https://github.com.proxy
 ```
 
 2) 设置git全面代理：
@@ -17,7 +20,13 @@ git config --global --unset https.https://github.com.proxy
 ```js
 git config --global http.proxy http://127.0.0.1:7890
 git config --global https.proxy http://127.0.0.1:7890
-取消设置的代理
+//取消设置的代理
 git config --global --unset http.proxy
 git config --global --unset https.proxy
+```
+
+1) 查看git全面代理：
+```js
+git config --global --get http.proxy
+git config --global --get https.proxy
 ```
