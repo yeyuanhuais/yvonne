@@ -1,0 +1,395 @@
+<div class="cnblogs_code" onclick="cnblogs_code_show('c6ad8a89-ffd4-4af6-b9ee-1a9cc7a24041')"><img src="./images/ContractedBlock.gif" id="code_img_closed_c6ad8a89-ffd4-4af6-b9ee-1a9cc7a24041" class="code_img_closed" /><img src="./images/ExpandedBlockStart.gif" id="code_img_opened_c6ad8a89-ffd4-4af6-b9ee-1a9cc7a24041" class="code_img_opened" style="display: none;" />
+<div id="cnblogs_code_open_c6ad8a89-ffd4-4af6-b9ee-1a9cc7a24041" class="cnblogs_code_hide">
+<pre><span style="color: #008000;">/*</span><span style="color: #008000;">*
+ * 全站路由配置
+ *
+ * 建议:
+ * 1. 代码中路由统一使用name属性跳转(不使用path属性)
+ </span><span style="color: #008000;">*/</span><span style="color: #000000;">
+import Vue from </span>'vue'<span style="color: #000000;">
+import Router from </span>'vue-router'<span style="color: #000000;">
+import http from </span>'@/utils/httpRequest'<span style="color: #000000;">
+import {
+  isURL
+} from </span>'@/utils/validate'<span style="color: #000000;">
+import {
+  clearLoginInfo
+} from </span>'@/utils'<span style="color: #000000;">
+
+Vue.use(Router)
+console.log(</span>'===================='<span style="color: #000000;">, process.env.NODE_ENV)
+</span><span style="color: #008000;">//</span><span style="color: #008000;"> 开发环境不使用懒加载, 因为懒加载页面太多的话会造成webpack热更新太慢, 所以只有生产环境使用懒加载</span>
+const _import = require('./import-' +<span style="color: #000000;"> process.env.NODE_ENV)
+
+</span><span style="color: #008000;">//</span><span style="color: #008000;"> 全局路由(无需嵌套上左右整体布局)</span>
+const globalRoutes =<span style="color: #000000;"> [{
+  path: </span>'/404'<span style="color: #000000;">,
+  component: _import(</span>'common/404'<span style="color: #000000;">),
+  name: </span>'404'<span style="color: #000000;">,
+  meta: {
+    title: </span>'404未找到'<span style="color: #000000;">
+  }
+},
+{
+  path: </span>'/login'<span style="color: #000000;">,
+  component: _import(</span>'common/login'<span style="color: #000000;">),
+  name: </span>'login'<span style="color: #000000;">,
+  meta: {
+    title: </span>'登录'<span style="color: #000000;">
+  }
+},
+{
+  path: `</span>/loginSSO`,
+  component: _import('common/login'<span style="color: #000000;">),
+  name: </span>'login'<span style="color: #000000;">,
+  meta: {
+    title: </span>'登录'<span style="color: #000000;">
+  }
+},
+</span><span style="color: #008000;">//</span><span style="color: #008000;"> { path: '/login-template', component: _import('common/login-template'), name: 'login-template', meta: { title: '登录' } },</span>
+<span style="color: #000000;">{
+  path: </span>'/screen'<span style="color: #000000;">,
+  component: _import(</span>'modules/screen/index'<span style="color: #000000;">),
+  name: </span>'screen'<span style="color: #000000;">,
+  meta: {
+    title: </span>'大屏old'<span style="color: #000000;">
+  }
+},
+{
+  path: </span>'/new_screen'<span style="color: #000000;">,
+  component: _import(</span>'modules/new_screen/index'<span style="color: #000000;">),
+  name: </span>'new_screen'<span style="color: #000000;">,
+  meta: {
+    title: </span>'大屏'<span style="color: #000000;">
+  }
+},
+{
+  path: </span>'/communityScreen'<span style="color: #000000;">,
+  component: _import(</span>'modules/communityScreen/index'<span style="color: #000000;">),
+  name: </span>'screen'<span style="color: #000000;">,
+  meta: {
+    title: </span>'社区大屏'<span style="color: #000000;">
+  }
+},
+{
+  path: </span>'/mytest'<span style="color: #000000;">,
+  component: _import(</span>'demo/mytest'<span style="color: #000000;">),
+  name: </span>'mytest'<span style="color: #000000;">,
+  meta: {
+    title: </span>'测试页'<span style="color: #000000;">
+  }
+},
+]
+
+</span><span style="color: #008000;">//</span><span style="color: #008000;"> 临时暂存在demo菜单里面的页面</span>
+const demoList = ['panel', 'list', 'detail'<span style="color: #000000;">]
+
+</span><span style="color: #0000ff;">function</span><span style="color: #000000;"> tempDemoPage(list) {
+  </span><span style="color: #0000ff;">return</span> list.map(item =&gt;<span style="color: #000000;"> {
+    </span><span style="color: #0000ff;">return</span><span style="color: #000000;"> {
+      path: `</span>/demo-${item}`,
+      component: _import(`demo/${item}`),
+      name: `demo-<span style="color: #000000;">${item}`,
+      meta: {
+        title: `demo</span>-<span style="color: #000000;">${item}`,
+        isTab: </span><span style="color: #0000ff;">true</span><span style="color: #000000;">
+      }
+    }
+  })
+}
+
+</span><span style="color: #008000;">//</span><span style="color: #008000;"> 主入口路由(需嵌套上左右整体布局)</span>
+const mainRoutes =<span style="color: #000000;"> {
+  path: </span>'/'<span style="color: #000000;">,
+  component: _import(</span>'main'<span style="color: #000000;">),
+  name: </span>'main'<span style="color: #000000;">,
+  redirect: {
+    name: </span>'home'<span style="color: #000000;">
+  },
+  meta: {
+    title: </span>'主入口整体布局'<span style="color: #000000;">
+  },
+  children: [
+    </span><span style="color: #008000;">//</span><span style="color: #008000;"> 通过meta对象设置路由展示方式</span>
+    <span style="color: #008000;">//</span><span style="color: #008000;"> 1. isTab: 是否通过tab展示内容, true: 是, false: 否</span>
+    <span style="color: #008000;">//</span><span style="color: #008000;"> 2. iframeUrl: 是否通过iframe嵌套展示内容, '以http[s]://开头': 是, '': 否</span>
+    <span style="color: #008000;">//</span><span style="color: #008000;"> 提示: 如需要通过iframe嵌套展示内容, 但不通过tab打开, 请自行创建组件使用iframe处理!</span>
+<span style="color: #000000;">    {
+      path: </span>'/home'<span style="color: #000000;">,
+      component: _import(</span>'common/home'<span style="color: #000000;">),
+      name: </span>'home'<span style="color: #000000;">,
+      meta: {
+        title: </span>'首页'<span style="color: #000000;">
+      }
+    },
+    {
+      path: </span>'/theme'<span style="color: #000000;">,
+      component: _import(</span>'common/theme'<span style="color: #000000;">),
+      name: </span>'theme'<span style="color: #000000;">,
+      meta: {
+        title: </span>'主题'<span style="color: #000000;">
+      }
+    },
+    {
+      path: </span>'/demo-echarts'<span style="color: #000000;">,
+      component: _import(</span>'demo/echarts'<span style="color: #000000;">),
+      name: </span>'demo-echarts'<span style="color: #000000;">,
+      meta: {
+        title: </span>'demo-echarts'<span style="color: #000000;">,
+        isTab: </span><span style="color: #0000ff;">true</span><span style="color: #000000;">
+      }
+    },
+    {
+      path: </span>'/demo-ueditor'<span style="color: #000000;">,
+      component: _import(</span>'demo/ueditor'<span style="color: #000000;">),
+      name: </span>'demo-ueditor'<span style="color: #000000;">,
+      meta: {
+        title: </span>'demo-ueditor'<span style="color: #000000;">,
+        isTab: </span><span style="color: #0000ff;">true</span><span style="color: #000000;">
+      }
+    },
+    {
+      path: </span>'/mytest'<span style="color: #000000;">,
+      component: _import(</span>'demo/mytest'<span style="color: #000000;">),
+      name: </span>'mytest'<span style="color: #000000;">,
+      meta: {
+        title: </span>'mytest'<span style="color: #000000;">,
+        isTab: </span><span style="color: #0000ff;">true</span><span style="color: #000000;">
+      }
+    }
+  ].concat(tempDemoPage(demoList)),
+
+  beforeEnter(to, from, next) {
+
+    let token </span>= Vue.cookie.get('token'<span style="color: #000000;">)
+    </span><span style="color: #008000;">//</span><span style="color: #008000;"> if (!token || !/\S/.test(token)) {</span>
+    <span style="color: #008000;">//</span><span style="color: #008000;">   clearLoginInfo()</span>
+    <span style="color: #008000;">//</span><span style="color: #008000;">   next({ name: 'login' })</span>
+    <span style="color: #008000;">//</span><span style="color: #008000;"> }</span>
+<span style="color: #000000;">    next()
+  }
+}
+
+const router </span>= <span style="color: #0000ff;">new</span><span style="color: #000000;"> Router({
+  mode: </span>'hash'<span style="color: #000000;">,
+  scrollBehavior: () </span>=&gt;<span style="color: #000000;"> ({
+    y: </span>0<span style="color: #000000;">
+  }),
+  isAddDynamicMenuRoutes: </span><span style="color: #0000ff;">false</span>, <span style="color: #008000;">//</span><span style="color: #008000;"> 是否已经添加动态(菜单)路由</span>
+<span style="color: #000000;">  routes: globalRoutes.concat(mainRoutes)
+})
+router.beforeResolve((to, from, next) </span>=&gt;<span style="color: #000000;"> {
+  </span><span style="color: #008000;">//</span><span style="color: #008000;"> console.log("准备进入路由模板");</span>
+  <span style="color: #008000;">//</span><span style="color: #008000;"> let addr = window.location.href.split("/");</span>
+  <span style="color: #008000;">//</span><span style="color: #008000;"> console.log(window.location.href);</span>
+  <span style="color: #008000;">//</span><span style="color: #008000;"> console.log(addr);</span>
+<span style="color: #000000;">  next();
+})
+router.beforeEach((to, from, next) </span>=&gt;<span style="color: #000000;"> {
+  </span><span style="color: #008000;">//</span><span style="color: #008000;"> 添加动态(菜单)路由</span>
+  <span style="color: #008000;">//</span><span style="color: #008000;"> 1. 已经添加 or 全局路由, 直接访问</span>
+  <span style="color: #008000;">//</span><span style="color: #008000;"> 2. 获取菜单列表, 添加并保存本地存储</span>
+  <span style="color: #0000ff;">if</span> (router.options.isAddDynamicMenuRoutes || fnCurrentRouteType(to, globalRoutes) === 'global'<span style="color: #000000;">) {
+    next()
+  } </span><span style="color: #0000ff;">else</span><span style="color: #000000;"> {
+    http({
+      url: http.adornUrl(</span>'/sys/menu/nav'<span style="color: #000000;">),
+      method: </span>'get'<span style="color: #000000;">,
+      params: http.adornParams()
+    }).then(({
+      data
+    }) </span>=&gt;<span style="color: #000000;"> {
+      </span><span style="color: #0000ff;">if</span> (data &amp;&amp; data.code === 0<span style="color: #000000;">) {
+        console.log(data)
+        fnAddDynamicMenuRoutes(data.menuList)
+        router.options.isAddDynamicMenuRoutes </span>= <span style="color: #0000ff;">true</span><span style="color: #000000;">
+        sessionStorage.setItem(</span>'menuList', JSON.stringify(data.menuList || '[]'<span style="color: #000000;">))
+        sessionStorage.setItem(</span>'permissions', JSON.stringify(data.permissions || '[]'<span style="color: #000000;">))
+        next({
+          ...to,
+          replace: </span><span style="color: #0000ff;">true</span><span style="color: #000000;">
+        })
+      } </span><span style="color: #0000ff;">else</span><span style="color: #000000;"> {
+        sessionStorage.setItem(</span>'menuList', '[]'<span style="color: #000000;">)
+        sessionStorage.setItem(</span>'permissions', '[]'<span style="color: #000000;">)
+        next()
+      }
+    }).</span><span style="color: #0000ff;">catch</span>((e) =&gt;<span style="color: #000000;"> {
+      console.log(`</span>%c${e} 请求菜单列表和权限失败，跳转至登录页！！`, 'color:blue'<span style="color: #000000;">)
+      router.push({
+        name: </span>'login'<span style="color: #000000;">
+      })
+      next()
+    })
+  }
+})
+
+</span><span style="color: #008000;">/*</span><span style="color: #008000;">*
+ * 判断当前路由类型, global: 全局路由, main: 主入口路由
+ * @param {*} route 当前路由
+ </span><span style="color: #008000;">*/</span>
+<span style="color: #0000ff;">function</span> fnCurrentRouteType(route, globalRoutes =<span style="color: #000000;"> []) {
+  </span><span style="color: #0000ff;">var</span> temp =<span style="color: #000000;"> []
+  </span><span style="color: #0000ff;">for</span> (<span style="color: #0000ff;">var</span> i = 0; i &lt; globalRoutes.length; i++<span style="color: #000000;">) {
+    </span><span style="color: #0000ff;">if</span> (route.path ===<span style="color: #000000;"> globalRoutes[i].path) {
+      </span><span style="color: #0000ff;">return</span> 'global'<span style="color: #000000;">
+    } </span><span style="color: #0000ff;">else</span> <span style="color: #0000ff;">if</span> (globalRoutes[i].children &amp;&amp; globalRoutes[i].children.length &gt;= 1<span style="color: #000000;">) {
+      temp </span>=<span style="color: #000000;"> temp.concat(globalRoutes[i].children)
+    }
+  }
+  </span><span style="color: #0000ff;">return</span> temp.length &gt;= 1 ? fnCurrentRouteType(route, temp) : 'main'<span style="color: #000000;">
+}
+
+</span><span style="color: #008000;">/*</span><span style="color: #008000;">*
+ * 添加动态(菜单)路由
+ * @param {*} menuList 菜单列表
+ * @param {*} routes 递归创建的动态(菜单)路由
+ * @param {*} menuMap 递归创建的动态(菜单)map
+ </span><span style="color: #008000;">*/</span>
+<span style="color: #0000ff;">function</span> fnAddDynamicMenuRoutes(menuList = [], routes = [], menuMap =<span style="color: #000000;"> {}) {
+  console.log(</span>'menuList'<span style="color: #000000;">)
+  console.log(menuList)
+  </span><span style="color: #008000;">//</span><span style="color: #008000;"> debugger</span>
+  <span style="color: #0000ff;">var</span> temp =<span style="color: #000000;"> []
+  </span><span style="color: #0000ff;">for</span><span style="color: #000000;"> (const menu of menuList) {
+
+    menuMap[menu.menuId] </span>=<span style="color: #000000;"> menu
+    </span><span style="color: #008000;">//</span><span style="color: #008000;"> if (menu.menuId == '7361DF68C0A800D23878386544695432') {</span>
+    <span style="color: #008000;">//</span><span style="color: #008000;">   debugger</span>
+    <span style="color: #008000;">//</span><span style="color: #008000;">   // console.log(menu)7364B655C0A800D21F66464AC90C3290</span>
+    <span style="color: #008000;">//</span><span style="color: #008000;"> }</span>
+    <span style="color: #0000ff;">if</span> (menu.list &amp;&amp; menu.list.length &gt; 0<span style="color: #000000;">) {
+      temp </span>=<span style="color: #000000;"> temp.concat(menu.list)
+      let list </span>=<span style="color: #000000;"> menu.list
+      let resList </span>= list.filter(item =&gt; item.type == 3<span style="color: #000000;">)
+      </span><span style="color: #0000ff;">if</span><span style="color: #000000;"> (resList.length) {
+        </span><span style="color: #0000ff;">for</span><span style="color: #000000;"> (const item of resList) {
+          </span><span style="color: #0000ff;">if</span> (item.list &amp;&amp; item.list.length &gt;= 1<span style="color: #000000;">) {
+            </span><span style="color: #008000;">//</span><span style="color: #008000;"> if (menu.menuId == '7361DF68C0A800D23878386544695432') {</span>
+            <span style="color: #008000;">//</span><span style="color: #008000;">   debugger</span>
+            <span style="color: #008000;">//</span><span style="color: #008000;">   // console.log(menu)7364B655C0A800D21F66464AC90C3290</span>
+            <span style="color: #008000;">//</span><span style="color: #008000;"> }</span>
+            temp =<span style="color: #000000;"> temp.concat(item.list)
+            </span><span style="color: #0000ff;">if</span> (menu.menuId == '7361DF68C0A800D23878386544695432'<span style="color: #000000;">) {
+              </span><span style="color: #008000;">//</span><span style="color: #008000;"> debugger</span>
+              <span style="color: #008000;">//</span><span style="color: #008000;"> console.log(menu)7364B655C0A800D21F66464AC90C3290</span>
+<span style="color: #000000;">            }
+          } </span><span style="color: #0000ff;">else</span> <span style="color: #0000ff;">if</span> (item.url &amp;&amp; /\S/<span style="color: #000000;">.test(item.url)) {
+            item.url </span>= item.url.replace(/^\//, ''<span style="color: #000000;">)
+            </span><span style="color: #0000ff;">var</span> route =<span style="color: #000000;"> {
+              path: item.url.replace(</span>'/', '-'<span style="color: #000000;">),
+              component: </span><span style="color: #0000ff;">null</span><span style="color: #000000;">,
+              name: item.url.replace(</span>'/', '-'<span style="color: #000000;">),
+              meta: {
+                menuId: item.menuId,
+                title: item.name,
+                isDynamic: </span><span style="color: #0000ff;">true</span><span style="color: #000000;">,
+                isTab: </span><span style="color: #0000ff;">true</span><span style="color: #000000;">,
+                iframeUrl: </span>''<span style="color: #000000;">
+              }
+            }
+            </span><span style="color: #008000;">//</span><span style="color: #008000;"> url以http[s]://开头, 通过iframe展示</span>
+            <span style="color: #0000ff;">if</span><span style="color: #000000;"> (isURL(item.url)) {
+              route[</span>'path'] = `i-<span style="color: #000000;">${item.menuId}`
+              route[</span>'name'] = `i-<span style="color: #000000;">${item.menuId}`
+              route[</span>'meta']['iframeUrl'] =<span style="color: #000000;"> item.url
+            } </span><span style="color: #0000ff;">else</span><span style="color: #000000;"> {
+              </span><span style="color: #0000ff;">try</span><span style="color: #000000;"> {
+                route[</span>'component'] = _import(`modules/${item.url}`) || null
+                <span style="color: #008000;">//</span><span style="color: #008000;"> console.log(`modules/${item.url}`)</span>
+              } <span style="color: #0000ff;">catch</span><span style="color: #000000;"> (e) { }
+            }
+            routes.push(route)
+          }
+        }
+      } </span><span style="color: #0000ff;">else</span><span style="color: #000000;"> {
+        </span><span style="color: #008000;">//</span><span style="color: #008000;"> if (menu.menuId == '7361DF68C0A800D23878386544695432') {</span>
+        <span style="color: #008000;">//</span><span style="color: #008000;">   debugger</span>
+        <span style="color: #008000;">//</span><span style="color: #008000;">   // console.log(menu)7364B655C0A800D21F66464AC90C3290</span>
+        <span style="color: #008000;">//</span><span style="color: #008000;"> }</span>
+        temp =<span style="color: #000000;"> temp.concat(menu.list)
+      }
+    } </span><span style="color: #0000ff;">else</span> <span style="color: #0000ff;">if</span> (menu.url &amp;&amp; /\S/<span style="color: #000000;">.test(menu.url)) {
+      menu.url </span>= menu.url.replace(/^\//, ''<span style="color: #000000;">)
+      </span><span style="color: #0000ff;">var</span> route =<span style="color: #000000;"> {
+        path: menu.url.replace(</span>'/', '-'<span style="color: #000000;">),
+        component: </span><span style="color: #0000ff;">null</span><span style="color: #000000;">,
+        name: menu.url.replace(</span>'/', '-'<span style="color: #000000;">),
+        meta: {
+          menuId: menu.menuId,
+          title: menu.name,
+          isDynamic: </span><span style="color: #0000ff;">true</span><span style="color: #000000;">,
+          isTab: </span><span style="color: #0000ff;">true</span><span style="color: #000000;">,
+          iframeUrl: </span>''<span style="color: #000000;">
+        }
+      }
+      </span><span style="color: #008000;">//</span><span style="color: #008000;"> url以http[s]://开头, 通过iframe展示</span>
+      <span style="color: #0000ff;">if</span><span style="color: #000000;"> (isURL(menu.url)) {
+        route[</span>'path'] = `i-<span style="color: #000000;">${menu.menuId}`
+        route[</span>'name'] = `i-<span style="color: #000000;">${menu.menuId}`
+        route[</span>'meta']['iframeUrl'] =<span style="color: #000000;"> menu.url
+      } </span><span style="color: #0000ff;">else</span><span style="color: #000000;"> {
+        </span><span style="color: #0000ff;">try</span><span style="color: #000000;"> {
+          route[</span>'component'] = _import(`modules/${menu.url}`) || null
+          <span style="color: #008000;">//</span><span style="color: #008000;"> console.log(`modules/${menu.url}`)</span>
+        } <span style="color: #0000ff;">catch</span><span style="color: #000000;"> (e) { }
+      }
+      routes.push(route)
+    }
+    </span><span style="color: #008000;">//</span><span style="color: #008000;"> if (menu.list &amp;&amp; menu.list.length &gt;= 1) {</span>
+    <span style="color: #008000;">//</span><span style="color: #008000;">   temp = temp.concat(menu.list)</span>
+    <span style="color: #008000;">//</span><span style="color: #008000;"> } else if (menu.url &amp;&amp; /\S/.test(menu.url)) {</span>
+    <span style="color: #008000;">//</span><span style="color: #008000;">   menu.url = menu.url.replace(/^\//, '')</span>
+    <span style="color: #008000;">//</span><span style="color: #008000;">   var route = {</span>
+    <span style="color: #008000;">//</span><span style="color: #008000;">     path: menu.url.replace('/', '-'),</span>
+    <span style="color: #008000;">//</span><span style="color: #008000;">     component: null,</span>
+    <span style="color: #008000;">//</span><span style="color: #008000;">     name: menu.url.replace('/', '-'),</span>
+    <span style="color: #008000;">//</span><span style="color: #008000;">     meta: {</span>
+    <span style="color: #008000;">//</span><span style="color: #008000;">       menuId: menu.menuId,</span>
+    <span style="color: #008000;">//</span><span style="color: #008000;">       title: menu.name,</span>
+    <span style="color: #008000;">//</span><span style="color: #008000;">       isDynamic: true,</span>
+    <span style="color: #008000;">//</span><span style="color: #008000;">       isTab: true,</span>
+    <span style="color: #008000;">//</span><span style="color: #008000;">       iframeUrl: ''</span>
+    <span style="color: #008000;">//</span><span style="color: #008000;">     }</span>
+    <span style="color: #008000;">//</span><span style="color: #008000;">   }</span>
+    <span style="color: #008000;">//</span><span style="color: #008000;">   // url以http[s]://开头, 通过iframe展示</span>
+    <span style="color: #008000;">//</span><span style="color: #008000;">   if (isURL(menu.url)) {</span>
+    <span style="color: #008000;">//</span><span style="color: #008000;">     route['path'] = `i-${menu.menuId}`</span>
+    <span style="color: #008000;">//</span><span style="color: #008000;">     route['name'] = `i-${menu.menuId}`</span>
+    <span style="color: #008000;">//</span><span style="color: #008000;">     route['meta']['iframeUrl'] = menu.url</span>
+    <span style="color: #008000;">//</span><span style="color: #008000;">   } else {</span>
+    <span style="color: #008000;">//</span><span style="color: #008000;">     try {</span>
+    <span style="color: #008000;">//</span><span style="color: #008000;">       route['component'] = _import(`modules/${menu.url}`) || null</span>
+    <span style="color: #008000;">//</span><span style="color: #008000;">       // console.log(`modules/${menu.url}`)</span>
+    <span style="color: #008000;">//</span><span style="color: #008000;">     } catch (e) { }</span>
+    <span style="color: #008000;">//</span><span style="color: #008000;">   }</span>
+    <span style="color: #008000;">//</span><span style="color: #008000;">   routes.push(route)</span>
+    <span style="color: #008000;">//</span><span style="color: #008000;"> }</span>
+<span style="color: #000000;">  }
+  </span><span style="color: #0000ff;">if</span> (temp.length &gt;= 1<span style="color: #000000;">) {
+    fnAddDynamicMenuRoutes(temp, routes, menuMap)
+  } </span><span style="color: #0000ff;">else</span><span style="color: #000000;"> {
+    mainRoutes.name </span>= 'main-dynamic'<span style="color: #000000;">
+    mainRoutes.children </span>=<span style="color: #000000;"> routes
+    router.addRoutes([
+      mainRoutes,
+      {
+        path: </span>'*'<span style="color: #000000;">,
+        redirect: {
+          name: </span>'404'<span style="color: #000000;">
+        }
+      }
+    ])
+    sessionStorage.setItem(</span>'dynamicMenuRoutes', JSON.stringify(mainRoutes.children || '[]'<span style="color: #000000;">))
+    sessionStorage.setItem(</span>'menuMap'<span style="color: #000000;">, JSON.stringify(menuMap))
+    </span><span style="color: #008000;">//</span><span style="color: #008000;"> console.log('%c!&lt;-------------------- 动态(菜单)路由 s --------------------&gt;', 'color:blue')</span>
+    <span style="color: #008000;">//</span><span style="color: #008000;"> console.log(mainRoutes)</span>
+    <span style="color: #008000;">//</span><span style="color: #008000;"> console.log(mainRoutes.children)</span>
+    <span style="color: #008000;">//</span><span style="color: #008000;"> console.log(mainRoutes.children.map(item =&gt; item.meta.title))</span>
+    <span style="color: #008000;">//</span><span style="color: #008000;"> console.log('%c!&lt;-------------------- 动态(菜单)路由 e --------------------&gt;', 'color:blue')</span>
+<span style="color: #000000;">  }
+}
+export </span><span style="color: #0000ff;">default</span> router</pre>
+</div>
+<span class="cnblogs_code_collapse">View Code</span></div>
+<p>&nbsp;</p>

@@ -1,0 +1,338 @@
+<p><img src="./images/1798975-20200716091502648-1694543129.png" alt="" loading="lazy" /></p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<div class="cnblogs_code">
+<pre>&lt;template&gt;
+  &lt;div&gt;
+    &lt;el-form-item&gt;
+      &lt;template slot="label"&gt;
+        &lt;span class="checkCycle"&gt;维保频次:&lt;/span&gt;
+      &lt;/template&gt;
+      &lt;el-input-number v-model="newTemplateForm.cycleTypeNum" :disabled="viewDetials" controls-position="right" :min="1" style="width: 80px;" size="small"&gt;
+      &lt;/el-input-number&gt;
+      &lt;el-select v-model="newTemplateForm.cycleType" :disabled="viewDetials" placeholder="请选择" style="width: 80px;" size="small"&gt;
+        &lt;el-option v-<span style="color: #0000ff;">for</span>="(item, index) in cycleCompany" :key="index" :label="item.label" :value="item.value"&gt;
+        &lt;/el-option&gt;
+      &lt;/el-select&gt;
+      &lt;el-input-number v-model="newTemplateForm.cycleFrequency" :disabled="viewDetials" controls-position="right" :min="1" @change="dayNumChange" style="width: 80px;" size="small"&gt;
+      &lt;/el-input-number&gt; 次
+    &lt;/el-form-item&gt;
+    &lt;el-form-item label-width="0px"&gt;
+      &lt;el-table class="cycles" :data="newTemplateForm.cycleUpkeep" border style="width: 100%" :row-style="{height:0+'px'}" :cell-style="{padding:0+'px'}"&gt;
+        &lt;el-table-column prop="dayNum" label="n" width="25" align="center"&gt;&lt;/el-table-column&gt;
+        &lt;el-table-column prop="timeStart" label="任务开始" align="center"&gt;
+          &lt;template slot-scope="scope"&gt;
+            &lt;el-tooltip v-<span style="color: #0000ff;">if</span>="scope.row.dayNum === 1" class="item" effect="dark" :content="scope.row.timeStart" placement="top"&gt;
+              &lt;el-date-picker :disabled="viewDetials" style="width: 100%;" v-model="scope.row.timeStart" type="datetime" format="yyyy-MM-dd HH:mm" value-format="yyyy-MM-dd HH:mm" <span style="color: #0000ff;">default</span>-time="00:00:00" placeholder="选择日期时间" :picker-options="pickOptionsStart1" @blur="checkPickerDateOver" size="small"&gt;
+              &lt;/el-date-picker&gt;
+            &lt;/el-tooltip&gt;
+            &lt;el-tooltip v-<span style="color: #0000ff;">else</span> class="item" effect="dark" :content="scope.row.timeStart" placement="top"&gt;
+              &lt;el-date-picker :disabled="viewDetials" style="width: 100%;" v-model="scope.row.timeStart" type="datetime" format="yyyy-MM-dd HH:mm" value-format="yyyy-MM-dd HH:mm" <span style="color: #0000ff;">default</span>-time="00:00:00" placeholder="选择日期时间" :picker-options="pickOptionsStart" @blur="checkPickerDateOver" size="small"&gt;
+              &lt;/el-date-picker&gt;
+            &lt;/el-tooltip&gt;
+          &lt;/template&gt;
+        &lt;/el-table-column&gt;
+        &lt;el-table-column prop="timeEnd" label="任务结束" align="center"&gt;
+          &lt;template slot-scope="scope"&gt;
+            &lt;el-tooltip class="item" effect="dark" :content="scope.row.timeEnd" placement="top"&gt;
+              &lt;el-date-picker :disabled="viewDetials" style="width: 100%;" v-model="scope.row.timeEnd" type="datetime" format="yyyy-MM-dd HH:mm" value-format="yyyy-MM-dd HH:mm" <span style="color: #0000ff;">default</span>-time="23:59:00" placeholder="选择日期时间" :picker-options="pickOptionsEnd" @blur="checkPickerDateOver" size="small"&gt;
+              &lt;/el-date-picker&gt;
+            &lt;/el-tooltip&gt;
+          &lt;/template&gt;
+        &lt;/el-table-column&gt;
+      &lt;/el-table&gt;
+      &lt;div class="el-form-item__error time_cycle" v-<span style="color: #0000ff;">if</span>="timeInputOver"&gt;请填写完整的时间&lt;/div&gt;
+    &lt;/el-form-item&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+&lt;script&gt;<span style="color: #000000;">
+export </span><span style="color: #0000ff;">default</span><span style="color: #000000;"> {
+  props: {
+    newTemplateForm: {
+      type: Object,
+      </span><span style="color: #0000ff;">default</span><span style="color: #000000;">: {
+        cycleFrequency: </span>1, <span style="color: #008000;">//</span><span style="color: #008000;"> 频次间隔</span>
+        cycleType: 1, <span style="color: #008000;">//</span><span style="color: #008000;"> 频次单位</span>
+        cycleTypeNum: 1, <span style="color: #008000;">//</span><span style="color: #008000;"> 频次</span>
+<span style="color: #000000;">        cycleUpkeep: [{
+          dayNum: </span>1<span style="color: #000000;">,
+          timeStart: </span>''<span style="color: #000000;">,
+          timeEnd: </span>''<span style="color: #000000;">
+        }],</span><span style="color: #008000;">//</span><span style="color: #008000;">模板定时</span>
+<span style="color: #000000;">      }
+    },
+    viewDetials: {
+      type: Boolean,
+      </span><span style="color: #0000ff;">default</span>: <span style="color: #0000ff;">false</span><span style="color: #000000;">
+    }
+  },
+  data() {
+    </span><span style="color: #0000ff;">return</span><span style="color: #000000;"> {
+      pickOptionsStart1: </span><span style="color: #0000ff;">this</span><span style="color: #000000;">.limitStartTime1(),
+      pickOptionsStart: </span><span style="color: #0000ff;">this</span><span style="color: #000000;">.limitStartTime(),
+      pickOptionsEnd: </span><span style="color: #0000ff;">this</span><span style="color: #000000;">.limitEndTime(),
+      timeInputOver: </span><span style="color: #0000ff;">false</span>, <span style="color: #008000;">//</span><span style="color: #008000;"> 时间是否填写完整</span>
+      <span style="color: #008000;">//</span><span style="color: #008000;"> 新增频次单位</span>
+      cycleCompany: [{ value: 0, label: '天' }, { value: 1, label: '周' }, { value: 2, label: '月' }, { value: 3, label: '季' }, { value: 5, label: '年'<span style="color: #000000;"> }],
+    };
+  },
+  computed: {},
+  created() {
+    </span><span style="color: #0000ff;">this</span>.timeInputOver = <span style="color: #0000ff;">false</span><span style="color: #000000;">
+  },
+  mounted() { },
+  watch: {
+    </span><span style="color: #008000;">//</span><span style="color: #008000;"> 频次必须含有一条数据</span>
+<span style="color: #000000;">    newTemplateForm: {
+      handler(val) {
+        </span><span style="color: #008000;">//</span><span style="color: #008000;"> 频次任务 table 是否为数组</span>
+        <span style="color: #0000ff;">if</span> (!<span style="color: #000000;">Array.isArray(val.cycleUpkeep)) {
+          </span><span style="color: #0000ff;">this</span>.newTemplateForm.cycleUpkeep =<span style="color: #000000;"> [{
+            dayNum: </span>1<span style="color: #000000;">,
+            timeStart: </span>''<span style="color: #000000;">,
+            timeEnd: </span>''<span style="color: #000000;">
+          }]
+        }
+        </span><span style="color: #008000;">//</span><span style="color: #008000;"> 次数大于table数据条目数</span>
+        <span style="color: #0000ff;">if</span> (val.cycleFrequency &gt;<span style="color: #000000;"> val.cycleUpkeep.length) {
+          </span><span style="color: #0000ff;">for</span> (<span style="color: #0000ff;">var</span> i = <span style="color: #0000ff;">this</span>.newTemplateForm.cycleUpkeep.length + 1; i &lt;= <span style="color: #0000ff;">this</span>.newTemplateForm.cycleFrequency; i++<span style="color: #000000;">) {
+            </span><span style="color: #0000ff;">this</span><span style="color: #000000;">.newTemplateForm.cycleUpkeep.push({
+              dayNum: i,
+              timeStart: </span>''<span style="color: #000000;">,
+              timeEnd: </span>''<span style="color: #000000;">
+            })
+          }
+        }</span><span style="color: #0000ff;">else</span><span style="color: #000000;"> {
+          </span><span style="color: #008000;">//</span><span style="color: #008000;"> console.log('次数大于table数据条目数')</span>
+          <span style="color: #008000;">//</span><span style="color: #008000;"> console.log(this.newTemplateForm)</span>
+          <span style="color: #008000;">//</span><span style="color: #008000;"> 次数大于table数据条目数</span>
+          <span style="color: #0000ff;">for</span> (<span style="color: #0000ff;">var</span> i = <span style="color: #0000ff;">this</span>.newTemplateForm.cycleUpkeep.length; i &gt; <span style="color: #0000ff;">this</span>.newTemplateForm.cycleFrequency; i--<span style="color: #000000;">) {
+            </span><span style="color: #008000;">//</span><span style="color: #008000;"> console.log("删除多余的cycles")</span>
+            <span style="color: #0000ff;">this</span>.newTemplateForm.cycleUpkeep.splice(<span style="color: #0000ff;">this</span>.newTemplateForm.cycleUpkeep.length - 1<span style="color: #000000;">)
+          }
+        }
+        </span><span style="color: #008000;">//</span><span style="color: #008000;"> 时间间隔为 undefined 时</span>
+        <span style="color: #0000ff;">if</span> (!<span style="color: #0000ff;">this</span><span style="color: #000000;">.newTemplateForm.cycleTypeNum) {
+          </span><span style="color: #0000ff;">this</span>.newTemplateForm.cycleTypeNum = 1<span style="color: #000000;">
+        }
+        </span><span style="color: #008000;">//</span><span style="color: #008000;"> 时间单位 可能为 0：天</span>
+        <span style="color: #0000ff;">if</span> (!<span style="color: #0000ff;">this</span><span style="color: #000000;">.newTemplateForm.cycleType) {
+          </span><span style="color: #0000ff;">if</span> (<span style="color: #0000ff;">this</span>.newTemplateForm.cycleType === 0<span style="color: #000000;">) {
+            </span><span style="color: #0000ff;">this</span>.newTemplateForm.cycleType = 0<span style="color: #000000;">
+          } </span><span style="color: #0000ff;">else</span><span style="color: #000000;"> {
+            </span><span style="color: #0000ff;">this</span>.newTemplateForm.cycleType = 1<span style="color: #000000;">
+          }
+        }
+        </span><span style="color: #008000;">//</span><span style="color: #008000;"> 次数为 undefined 时</span>
+        <span style="color: #0000ff;">if</span> (!<span style="color: #0000ff;">this</span><span style="color: #000000;">.newTemplateForm.cycleFrequency) {
+          </span><span style="color: #0000ff;">this</span>.newTemplateForm.cycleFrequency = 1<span style="color: #000000;">
+        }
+        </span><span style="color: #008000;">//</span><span style="color: #008000;"> this.$emit('getNewTemplateForm',newTemplateForm)</span>
+<span style="color: #000000;">      },
+      </span><span style="color: #008000;">//</span><span style="color: #008000;"> immediate: true,</span>
+      deep: <span style="color: #0000ff;">true</span><span style="color: #000000;">
+    },
+    viewDetials: {
+      handler(val) {
+        console.log(val, </span>'viewDetials'<span style="color: #000000;">)
+      },
+      </span><span style="color: #008000;">//</span><span style="color: #008000;"> immediate: true,</span>
+<span style="color: #000000;">    }
+  },
+  methods: {
+    async init() {
+      </span><span style="color: #0000ff;">this</span>.timeInputOver = <span style="color: #0000ff;">false</span><span style="color: #000000;">
+    },
+    limitStartTime1() {
+      </span><span style="color: #0000ff;">var</span> that = <span style="color: #0000ff;">this</span>
+      <span style="color: #0000ff;">return</span><span style="color: #000000;"> {
+        disabledDate(time) {
+          </span><span style="color: #0000ff;">var</span> day = 7
+          <span style="color: #0000ff;">switch</span><span style="color: #000000;"> (that.newTemplateForm.cycleType) {
+            </span><span style="color: #0000ff;">case</span> 0<span style="color: #000000;">:
+              day </span>= 1
+              <span style="color: #0000ff;">break</span><span style="color: #000000;">;
+            </span><span style="color: #0000ff;">case</span> 1<span style="color: #000000;">:
+              day </span>= 7
+              <span style="color: #0000ff;">break</span><span style="color: #000000;">;
+            </span><span style="color: #0000ff;">case</span> 2<span style="color: #000000;">:
+              day </span>= 30
+              <span style="color: #0000ff;">break</span><span style="color: #000000;">;
+            </span><span style="color: #0000ff;">case</span> 3<span style="color: #000000;">:
+              day </span>= 91
+              <span style="color: #0000ff;">break</span><span style="color: #000000;">;
+            </span><span style="color: #0000ff;">case</span> 4<span style="color: #000000;">:
+              day </span>= 183
+              <span style="color: #0000ff;">break</span><span style="color: #000000;">;
+            </span><span style="color: #0000ff;">case</span> 5<span style="color: #000000;">:
+              day </span>= 365
+              <span style="color: #0000ff;">break</span><span style="color: #000000;">;
+            </span><span style="color: #0000ff;">default</span><span style="color: #000000;">:
+              </span><span style="color: #0000ff;">break</span><span style="color: #000000;">;
+          }
+          </span><span style="color: #0000ff;">return</span> time.getTime() &lt; Date.now() - 8.64e7<span style="color: #000000;">
+        }
+      }
+    },
+    limitStartTime() {
+      </span><span style="color: #0000ff;">var</span> that = <span style="color: #0000ff;">this</span>
+      <span style="color: #0000ff;">return</span><span style="color: #000000;"> {
+        disabledDate(time) {
+          </span><span style="color: #0000ff;">var</span> day = 7
+          <span style="color: #0000ff;">switch</span><span style="color: #000000;"> (that.newTemplateForm.cycleType) {
+            </span><span style="color: #0000ff;">case</span> 0<span style="color: #000000;">:
+              day </span>= 1
+              <span style="color: #0000ff;">break</span><span style="color: #000000;">;
+            </span><span style="color: #0000ff;">case</span> 1<span style="color: #000000;">:
+              day </span>= 7
+              <span style="color: #0000ff;">break</span><span style="color: #000000;">;
+            </span><span style="color: #0000ff;">case</span> 2<span style="color: #000000;">:
+              day </span>= 30
+              <span style="color: #0000ff;">break</span><span style="color: #000000;">;
+            </span><span style="color: #0000ff;">case</span> 3<span style="color: #000000;">:
+              day </span>= 91
+              <span style="color: #0000ff;">break</span><span style="color: #000000;">;
+            </span><span style="color: #0000ff;">case</span> 4<span style="color: #000000;">:
+              day </span>= 183
+              <span style="color: #0000ff;">break</span><span style="color: #000000;">;
+            </span><span style="color: #0000ff;">case</span> 5<span style="color: #000000;">:
+              day </span>= 365
+              <span style="color: #0000ff;">break</span><span style="color: #000000;">;
+            </span><span style="color: #0000ff;">default</span><span style="color: #000000;">:
+              </span><span style="color: #0000ff;">break</span><span style="color: #000000;">;
+          }
+          </span><span style="color: #0000ff;">return</span> time.getTime() &lt; (<span style="color: #0000ff;">new</span> Date(that.newTemplateForm.cycleUpkeep[0].timeStart).getTime()) || time.getTime() &gt; ((<span style="color: #0000ff;">new</span> Date(that.newTemplateForm.cycleUpkeep[0].timeStart).getTime() - 1 + 24 * 3600 * 1000 * day) *<span style="color: #000000;"> that.newTemplateForm.cycleTypeNum)
+        }
+      }
+    },
+    limitEndTime() {
+      </span><span style="color: #0000ff;">var</span> that = <span style="color: #0000ff;">this</span>
+      <span style="color: #008000;">//</span><span style="color: #008000;"> 周期计算</span>
+      <span style="color: #0000ff;">return</span><span style="color: #000000;"> {
+        disabledDate(time) {
+          </span><span style="color: #0000ff;">var</span> day = 7
+          <span style="color: #0000ff;">switch</span><span style="color: #000000;"> (that.newTemplateForm.cycleType) {
+            </span><span style="color: #0000ff;">case</span> 0<span style="color: #000000;">:
+              day </span>= 1
+              <span style="color: #0000ff;">break</span><span style="color: #000000;">;
+            </span><span style="color: #0000ff;">case</span> 1<span style="color: #000000;">:
+              day </span>= 7
+              <span style="color: #0000ff;">break</span><span style="color: #000000;">;
+            </span><span style="color: #0000ff;">case</span> 2<span style="color: #000000;">:
+              day </span>= 30
+              <span style="color: #0000ff;">break</span><span style="color: #000000;">;
+            </span><span style="color: #0000ff;">case</span> 3<span style="color: #000000;">:
+              day </span>= 91
+              <span style="color: #0000ff;">break</span><span style="color: #000000;">;
+            </span><span style="color: #0000ff;">case</span> 4<span style="color: #000000;">:
+              day </span>= 183
+              <span style="color: #0000ff;">break</span><span style="color: #000000;">;
+            </span><span style="color: #0000ff;">case</span> 5<span style="color: #000000;">:
+              day </span>= 365
+              <span style="color: #0000ff;">break</span><span style="color: #000000;">;
+            </span><span style="color: #0000ff;">default</span><span style="color: #000000;">:
+              </span><span style="color: #0000ff;">break</span><span style="color: #000000;">;
+          }
+          </span><span style="color: #0000ff;">return</span> time.getTime() &lt; <span style="color: #0000ff;">new</span> Date(that.newTemplateForm.cycleUpkeep[0].timeStart).getTime() || time.getTime() &gt; ((<span style="color: #0000ff;">new</span> Date(that.newTemplateForm.cycleUpkeep[0].timeStart).getTime() - 1 + 24 * 3600 * 1000 * day) *<span style="color: #000000;"> that.newTemplateForm.cycleTypeNum)
+        }
+      }
+    },
+    </span><span style="color: #008000;">//</span><span style="color: #008000;"> 频次改变</span>
+<span style="color: #000000;">    dayNumChange(currentValue, oldValue) {
+      </span><span style="color: #008000;">//</span><span style="color: #008000;"> if (currentValue &gt; oldValue) {</span>
+      <span style="color: #008000;">//</span><span style="color: #008000;">   for (let i; i &lt;= currentValue; i++) {</span>
+      <span style="color: #008000;">//</span><span style="color: #008000;">     for (let j in this.newTemplateForm.cycleUpkeep) {</span>
+      <span style="color: #008000;">//</span><span style="color: #008000;">       if (i == j.dayNum) {</span>
+      <span style="color: #008000;">//</span><span style="color: #008000;">         continue</span>
+      <span style="color: #008000;">//</span><span style="color: #008000;">       } else {</span>
+      <span style="color: #008000;">//</span><span style="color: #008000;">         this.newTemplateForm.cycleUpkeep.push({ dayNum: i, timeStart: '', timeEnd: '' })</span>
+      <span style="color: #008000;">//</span><span style="color: #008000;">       }</span>
+      <span style="color: #008000;">//</span><span style="color: #008000;">     }</span>
+      <span style="color: #008000;">//</span><span style="color: #008000;">   }</span>
+      <span style="color: #008000;">//</span><span style="color: #008000;"> } else {</span>
+      <span style="color: #008000;">//</span><span style="color: #008000;">   if (this.newTemplateForm.cycleUpkeep.length &gt; currentValue) {</span>
+      <span style="color: #008000;">//</span><span style="color: #008000;">     this.newTemplateForm.cycleUpkeep.splice((this.newTemplateForm.cycleUpkeep.length - currentValue) - 1)</span>
+      <span style="color: #008000;">//</span><span style="color: #008000;">   }</span>
+      <span style="color: #008000;">//</span><span style="color: #008000;"> }</span>
+      <span style="color: #0000ff;">if</span> (currentValue &gt;<span style="color: #000000;"> oldValue) {
+        </span><span style="color: #0000ff;">this</span>.newTemplateForm.cycleUpkeep.push({ dayNum: currentValue, timeStart: '', timeEnd: ''<span style="color: #000000;"> })
+      } </span><span style="color: #0000ff;">else</span><span style="color: #000000;"> {
+        </span><span style="color: #0000ff;">if</span> (<span style="color: #0000ff;">this</span>.newTemplateForm.cycleUpkeep.length &gt; 1<span style="color: #000000;">) {
+          </span><span style="color: #0000ff;">this</span>.newTemplateForm.cycleUpkeep.splice(<span style="color: #0000ff;">this</span>.newTemplateForm.cycleUpkeep.length - 1<span style="color: #000000;">)
+        }
+      }
+    },
+    </span><span style="color: #008000;">//</span><span style="color: #008000;"> 时间填写是否完整</span>
+<span style="color: #000000;">    checkPickerDateOver() {
+      </span><span style="color: #0000ff;">var</span> spaceDateTimeCount = 0
+      <span style="color: #0000ff;">this</span>.newTemplateForm.cycleUpkeep.forEach(item =&gt;<span style="color: #000000;"> {
+        </span><span style="color: #0000ff;">if</span> (item.timeEnd === '' || item.timeStart === ''<span style="color: #000000;">) {
+          spaceDateTimeCount</span>++<span style="color: #000000;">
+        }
+      })
+      </span><span style="color: #0000ff;">if</span> (spaceDateTimeCount &gt; 0<span style="color: #000000;">) {
+        </span><span style="color: #0000ff;">this</span>.timeInputOver = <span style="color: #0000ff;">true</span>
+        <span style="color: #0000ff;">this</span>.$emit('stopGoNextStep', <span style="color: #0000ff;">true</span>) <span style="color: #008000;">//</span><span style="color: #008000;"> true 阻止下一步跳转</span>
+      } <span style="color: #0000ff;">else</span><span style="color: #000000;"> {
+        </span><span style="color: #0000ff;">this</span>.timeInputOver = <span style="color: #0000ff;">false</span>
+        <span style="color: #0000ff;">this</span>.$emit('stopGoNextStep', <span style="color: #0000ff;">false</span>) <span style="color: #008000;">//</span><span style="color: #008000;"> false 允许下一步跳转</span>
+<span style="color: #000000;">      }
+    },
+    </span><span style="color: #008000;">//</span><span style="color: #008000;"> 组件自验证频次是否填写完整 不发送事件</span>
+<span style="color: #000000;">    checkPickerDateOverNoEmit() {
+      </span><span style="color: #0000ff;">var</span> spaceDateTimeCount = 0
+      <span style="color: #0000ff;">this</span>.newTemplateForm.cycleUpkeep.forEach(item =&gt;<span style="color: #000000;"> {
+        </span><span style="color: #0000ff;">if</span> (item.timeEnd === '' || item.timeStart === ''<span style="color: #000000;">) {
+          spaceDateTimeCount</span>++<span style="color: #000000;">
+        }
+      })
+      </span><span style="color: #0000ff;">if</span> (spaceDateTimeCount &gt; 0<span style="color: #000000;">) {
+        </span><span style="color: #0000ff;">this</span>.timeInputOver = <span style="color: #0000ff;">true</span><span style="color: #000000;">
+      } </span><span style="color: #0000ff;">else</span><span style="color: #000000;"> {
+        </span><span style="color: #0000ff;">this</span>.timeInputOver = <span style="color: #0000ff;">false</span><span style="color: #000000;">
+      }
+    },
+  },
+};
+</span>&lt;/script&gt;
+&lt;style lang="less" scoped&gt;<span style="color: #000000;">
+  .el</span>-form-<span style="color: #000000;">item {
+    margin</span>-<span style="color: #000000;">bottom: 0px;
+  }
+  .time_cycle{
+    line</span>-height: 1 !<span style="color: #000000;">important;
+  }
+  @media screen and (max</span>-<span style="color: #000000;">width: 1024px) {
+    .checkCycle {
+      font</span>-<span style="color: #000000;">size: 12px;
+    }
+  }
+  .checkCycle::before {
+    content: </span>"*"<span style="color: #000000;">;
+    color: #f56c6c;
+    margin</span>-<span style="color: #000000;">right: 4px;
+  }
+  .cycles{
+    </span>/deep/.el-table__header-<span style="color: #000000;">wrapper{
+      line</span>-height: 0px !<span style="color: #000000;">important;
+    }
+  }
+</span>&lt;/style&gt;
+&lt;style&gt;<span style="color: #000000;">
+  .cycles .el</span>-<span style="color: #000000;">table .cell,
+  .cycles .el</span>-table--border th:first-<span style="color: #000000;">child .cell,
+  .cycles .el</span>-table--border td:first-<span style="color: #000000;">child .cell {
+    padding</span>-left: 0<span style="color: #000000;">;
+    padding</span>-right: 0<span style="color: #000000;">;
+  }
+  .cycles.el</span>-<span style="color: #000000;">table .cell,
+  .el</span>-table--border td:first-<span style="color: #000000;">child .cell,
+  .el</span>-table--border th:first-<span style="color: #000000;">child .cell {
+    padding: 0px;
+  }
+  .el</span>-input--suffix .el-<span style="color: #000000;">input__inner{
+    padding</span>-<span style="color: #000000;">right: 0px;
+  }
+</span>&lt;/style&gt;</pre>
+</div>
+<p>&nbsp;</p>

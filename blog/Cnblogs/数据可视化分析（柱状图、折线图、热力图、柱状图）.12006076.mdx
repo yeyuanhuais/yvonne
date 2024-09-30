@@ -1,0 +1,319 @@
+<p>分析文件&lsquo;集美大学各省录取分数.xlsx&rsquo;，完成以下功能：</p>
+<p>1）集美大学2015-2018年间不同省份在本一批的平均分数，柱状图展示排名前10的省份，</p>
+<p>2）分析福建省这3年各批次成绩情况，使用折线图展示结果，并预测2019年录取成绩</p>
+<p>3）分析其他省份数据。用热力图，地图方式绘制所有省份数据情况。</p>
+<p>4）根据输入省份动态显示省份分数线的分析图</p>
+<h5>导入相应的库</h5>
+<div class="cnblogs_code">
+<pre><span style="color: #0000ff;">import</span><span style="color: #000000;"> xlrd
+</span><span style="color: #0000ff;">import</span><span style="color: #000000;"> matplotlib.pyplot as plt
+</span><span style="color: #0000ff;">import</span><span style="color: #000000;"> numpy as np
+</span><span style="color: #0000ff;">from</span> urllib.request <span style="color: #0000ff;">import</span><span style="color: #000000;"> urlopen, quote
+</span><span style="color: #0000ff;">import</span><span style="color: #000000;"> requests,csv
+</span><span style="color: #0000ff;">import</span> pandas as pd <span style="color: #008000;">#</span><span style="color: #008000;">导入这些库后边都要用到</span>
+<span style="color: #0000ff;">from</span> pyecharts <span style="color: #0000ff;">import</span><span style="color: #000000;"> Line,Bar,Pie,<span class="p"><span class="n">Radar</span></span>
+</span><span style="color: #0000ff;">import</span><span style="color: #000000;"> json
+</span><span style="color: #0000ff;">from</span> werkzeug.utils <span style="color: #0000ff;">import</span><span style="color: #000000;"> redirect
+</span><span style="color: #0000ff;">from</span> flask <span style="color: #0000ff;">import</span> Flask, jsonify, render_template, request, url_for</pre>
+</div>
+<p>&nbsp;</p>
+<h2>python读取excel文件数据</h2>
+<div class="cnblogs_code">
+<pre><span style="color: #0000ff;">import</span><span style="color: #000000;"> xlrd
+excel_path</span>=<span style="color: #800000;">"</span><span style="color: #800000;">..\\grade.xlsx</span><span style="color: #800000;">"</span>
+<span style="color: #008000;">#</span><span style="color: #008000;">打开文件，获取excel文件的workbook（工作簿）对象</span>
+excel=xlrd.open_workbook(excel_path,encoding_override=<span style="color: #800000;">"</span><span style="color: #800000;">utf-8</span><span style="color: #800000;">"</span><span style="color: #000000;">)
+</span><span style="color: #008000;">#</span><span style="color: #008000;"> 返回所有Sheet对象的list</span>
+all_sheet=<span style="color: #000000;">excel.sheets()
+</span><span style="color: #008000;">#</span><span style="color: #008000;">循环遍历每个sheet对象存储表中所有数据</span>
+grade_list=<span style="color: #000000;">[]
+</span><span style="color: #008000;">#</span><span style="color: #008000;"> 将文件中数据存进grade_list</span>
+<span style="color: #0000ff;">for</span> sheet <span style="color: #0000ff;">in</span><span style="color: #000000;"> all_sheet:
+    </span><span style="color: #0000ff;">for</span> each_row <span style="color: #0000ff;">in</span> range(sheet.nrows):<span style="color: #008000;">#</span><span style="color: #008000;">循环打印每一行</span>
+        grade_list.append(sheet.row_values(each_row))</pre>
+</div>
+<h2>python移除列表空数据</h2>
+<div class="cnblogs_code">
+<pre>    <span style="color: #0000ff;">def</span><span style="color: #000000;"> removeNull(alist):
+        </span><span style="color: #0000ff;">for</span> i <span style="color: #0000ff;">in</span><span style="color: #000000;"> alist:
+            </span><span style="color: #0000ff;">if</span> i == <span style="color: #800000;">''</span><span style="color: #000000;">:
+                alist.remove(i)
+        </span><span style="color: #0000ff;">return</span> alist</pre>
+</div>
+<h2>python图表中文乱码</h2>
+<div class="cnblogs_code">
+<pre><span style="color: #008000;">#</span><span style="color: #008000;">设置中文乱码</span>
+<span style="color: #0000ff;">from</span> pylab <span style="color: #0000ff;">import</span> *<span style="color: #000000;">
+mpl.rcParams[</span><span style="color: #800000;">'</span><span style="color: #800000;">font.sans-serif</span><span style="color: #800000;">'</span>] = [<span style="color: #800000;">'</span><span style="color: #800000;">SimHei</span><span style="color: #800000;">'</span>]</pre>
+</div>
+<h2>python列表内所有数据相加求平均数</h2>
+<div class="cnblogs_code">
+<pre>    <span style="color: #008000;">#</span><span style="color: #008000;"> 列表数据相加求平均</span>
+    <span style="color: #0000ff;">def</span><span style="color: #000000;"> sum_list(items):
+        sum_numbers </span>=<span style="color: #000000;"> 0
+        count </span>=<span style="color: #000000;"> 0
+        </span><span style="color: #0000ff;">for</span> x <span style="color: #0000ff;">in</span><span style="color: #000000;"> items:
+            sum_numbers </span>+=<span style="color: #000000;"> x
+            count </span>+= 1
+        <span style="color: #0000ff;">return</span> int(sum_numbers / count)</pre>
+</div>
+<h2>python将字典前十key、value存入列表</h2>
+<div class="cnblogs_code">
+<pre>    <span style="color: #008000;">#</span><span style="color: #008000;">字典的前十key values</span>
+    <span style="color: #0000ff;">def</span><span style="color: #000000;"> topTenKey(dict_order):
+        count </span>=<span style="color: #000000;"> 0
+        order</span>=<span style="color: #000000;">[]
+        </span><span style="color: #0000ff;">for</span> key <span style="color: #0000ff;">in</span><span style="color: #000000;"> dict_order.keys():
+            count</span>+=1
+            <span style="color: #0000ff;">if</span> count&gt;10<span style="color: #000000;">:
+                </span><span style="color: #0000ff;">break</span>
+            <span style="color: #0000ff;">else</span><span style="color: #000000;">:
+                order.append(key)
+        </span><span style="color: #0000ff;">return</span><span style="color: #000000;"> order
+    </span><span style="color: #0000ff;">def</span><span style="color: #000000;"> topTenValue(dict_order):
+        count </span>=<span style="color: #000000;"> 0
+        order</span>=<span style="color: #000000;">[]
+        </span><span style="color: #0000ff;">for</span> key <span style="color: #0000ff;">in</span><span style="color: #000000;"> dict_order.values():
+            count</span>+=1
+            <span style="color: #0000ff;">if</span> count&gt;10<span style="color: #000000;">:
+                </span><span style="color: #0000ff;">break</span>
+            <span style="color: #0000ff;">else</span><span style="color: #000000;">:
+                order.append(key)
+        </span><span style="color: #0000ff;">return</span> order</pre>
+</div>
+<h2>python 移除列表第一个元素 和最后一个元素</h2>
+<div class="cnblogs_code">
+<pre><span style="color: #000000;">grade_list.pop(0)
+grade_list.pop()</span></pre>
+</div>
+<h2>flask框架使用，并从前端页面获取数据，后台处理返回页面</h2>
+<div class="cnblogs_code">
+<pre><span style="color: #0000ff;">from</span> flask <span style="color: #0000ff;">import</span><span style="color: #000000;"> Flask, jsonify, render_template, request, url_for
+
+app </span>= Flask(<span style="color: #800080;">__name__</span><span style="color: #000000;">)
+
+</span><span style="color: #0000ff;">def</span><span style="color: #000000;"> main():
+        @app.route(</span><span style="color: #800000;">"</span><span style="color: #800000;">/index</span><span style="color: #800000;">"</span><span style="color: #000000;">)
+    </span><span style="color: #0000ff;">def</span><span style="color: #000000;"> index():
+        </span><span style="color: #0000ff;">return</span> render_template(<span style="color: #800000;">"</span><span style="color: #800000;">Base.html</span><span style="color: #800000;">"</span><span style="color: #000000;">)
+
+        @app.route(</span><span style="color: #800000;">'</span><span style="color: #800000;">/test</span><span style="color: #800000;">'</span>,methods=[<span style="color: #800000;">'</span><span style="color: #800000;">POST</span><span style="color: #800000;">'</span><span style="color: #000000;">])
+    </span><span style="color: #0000ff;">def</span><span style="color: #000000;"> testGet():
+        year </span>= request.form.get(<span style="color: #800000;">'</span><span style="color: #800000;">year</span><span style="color: #800000;">'</span><span style="color: #000000;">)
+        tenYear(province_dict,int(year))
+        </span><span style="color: #0000ff;">print</span>(<span style="color: #800000;">"</span><span style="color: #800000;">执行get</span><span style="color: #800000;">"</span><span style="color: #000000;">)
+        </span><span style="color: #0000ff;">return</span> render_template(<span style="color: #800000;">"</span><span style="color: #800000;">Base.html</span><span style="color: #800000;">"</span><span style="color: #000000;">)
+
+</span><span style="color: #0000ff;">if</span> <span style="color: #800080;">__name__</span> == <span style="color: #800000;">'</span><span style="color: #800000;">__main__</span><span style="color: #800000;">'</span><span style="color: #000000;">:
+    main()
+    app.run(host</span>=<span style="color: #800000;">'</span><span style="color: #800000;">127.0.0.1</span><span style="color: #800000;">'</span>, port=8080, debug=True)</pre>
+</div>
+<div class="cnblogs_code">
+<pre><span style="color: #0000ff;">&lt;!</span><span style="color: #ff00ff;">DOCTYPE html</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #0000ff;">&lt;</span><span style="color: #800000;">html </span><span style="color: #ff0000;">lang</span><span style="color: #0000ff;">="en"</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #0000ff;">&lt;</span><span style="color: #800000;">head</span><span style="color: #0000ff;">&gt;</span>
+    <span style="color: #0000ff;">&lt;</span><span style="color: #800000;">meta </span><span style="color: #ff0000;">charset</span><span style="color: #0000ff;">="UTF-8"</span><span style="color: #0000ff;">&gt;</span>
+    <span style="color: #0000ff;">&lt;</span><span style="color: #800000;">title</span><span style="color: #0000ff;">&gt;</span>集美大学录取分数<span style="color: #0000ff;">&lt;/</span><span style="color: #800000;">title</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #0000ff;">&lt;/</span><span style="color: #800000;">head</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #0000ff;">&lt;</span><span style="color: #800000;">body</span><span style="color: #0000ff;">&gt;</span>
+    <span style="color: #0000ff;">&lt;</span><span style="color: #800000;">div </span><span style="color: #ff0000;">style</span><span style="color: #0000ff;">="display: flex"</span><span style="color: #0000ff;">&gt;</span>
+        <span style="color: #0000ff;">&lt;</span><span style="color: #800000;">div</span><span style="color: #0000ff;">&gt;</span>
+            <span style="color: #0000ff;">&lt;</span><span style="color: #800000;">form </span><span style="color: #ff0000;">action</span><span style="color: #0000ff;">="/test"</span><span style="color: #ff0000;"> method</span><span style="color: #0000ff;">="post"</span><span style="color: #0000ff;">&gt;</span>
+                <span style="color: #0000ff;">&lt;</span><span style="color: #800000;">input </span><span style="color: #ff0000;">type</span><span style="color: #0000ff;">="text"</span><span style="color: #ff0000;"> name</span><span style="color: #0000ff;">="year"</span> <span style="color: #0000ff;">&gt;</span>
+                <span style="color: #0000ff;">&lt;</span><span style="color: #800000;">input </span><span style="color: #ff0000;">type</span><span style="color: #0000ff;">="submit"</span><span style="color: #ff0000;"> value</span><span style="color: #0000ff;">="提交"</span><span style="color: #ff0000;"> onclick</span><span style="color: #0000ff;">="change(1)"</span><span style="color: #0000ff;">&gt;</span>
+            <span style="color: #0000ff;">&lt;/</span><span style="color: #800000;">form</span><span style="color: #0000ff;">&gt;</span>
+            <span style="color: #0000ff;">&lt;</span><span style="color: #800000;">br</span><span style="color: #0000ff;">&gt;</span>
+            <span style="color: #0000ff;">&lt;</span><span style="color: #800000;">iframe </span><span style="color: #ff0000;">src</span><span style="color: #0000ff;">="http://127.0.0.1:8080/ten"</span><span style="color: #ff0000;">
+                    width</span><span style="color: #0000ff;">="850px"</span><span style="color: #ff0000;"> height</span><span style="color: #0000ff;">="400px"</span><span style="color: #ff0000;">   frameborder</span><span style="color: #0000ff;">="1/0"</span><span style="color: #ff0000;">
+                    name</span><span style="color: #0000ff;">=""</span><span style="color: #ff0000;"> id</span><span style="color: #0000ff;">="iframe-b"</span><span style="color: #ff0000;"> scrolling</span><span style="color: #0000ff;">="no"</span><span style="color: #0000ff;">&gt;&lt;/</span><span style="color: #800000;">iframe</span><span style="color: #0000ff;">&gt;</span>
+        <span style="color: #0000ff;">&lt;/</span><span style="color: #800000;">div</span><span style="color: #0000ff;">&gt;</span>
+
+<span style="color: #0000ff;">&lt;/</span><span style="color: #800000;">body</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #0000ff;">&lt;</span><span style="color: #800000;">script</span><span style="color: #0000ff;">&gt;</span>
+
+    <span style="background-color: #f5f5f5; color: #0000ff;">function</span><span style="background-color: #f5f5f5; color: #000000;"> change(e) {
+        </span><span style="background-color: #f5f5f5; color: #0000ff;">if</span><span style="background-color: #f5f5f5; color: #000000;">(e</span><span style="background-color: #f5f5f5; color: #000000;">==</span><span style="background-color: #f5f5f5; color: #000000;">1</span><span style="background-color: #f5f5f5; color: #000000;">){
+            document.getElementById(</span><span style="background-color: #f5f5f5; color: #000000;">'</span><span style="background-color: #f5f5f5; color: #000000;">iframe-b</span><span style="background-color: #f5f5f5; color: #000000;">'</span><span style="background-color: #f5f5f5; color: #000000;">).contentWindow.location.reload();
+        }
+
+    }
+</span><span style="color: #0000ff;">&lt;/</span><span style="color: #800000;">script</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #0000ff;">&lt;/</span><span style="color: #800000;">html</span><span style="color: #0000ff;">&gt;</span></pre>
+</div>
+<p>&nbsp;</p>
+<p>1、项目采用的技术栈</p>
+<p>　　flask框架</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Numpy：矩阵计算与其它大多数框架的数据处理基础；</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Matplotlab：专业画图工具，话说这个单词还是真是在Matlab之间插入了plot这个词形成的；</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Pandas：提供类似于R语言的DataFrame操作，非常方便；</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 百度地图API</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 热力图</p>
+<p>　　pyecharts</p>
+<p>2、系统模块列表</p>
+<p>柱状图、折线图、热力图，饼状图，</p>
+<p>3、柱状图：集美大学2015-2018年间不同省份在本一批的平均分数，展示排名前10的省份。</p>
+<p>&nbsp;<img src="./images/1798975-20191208153456817-648154406.png" alt="" /></p>
+<div class="cnblogs_code">
+<pre><span style="color: #008000;">#</span><span style="color: #008000;">绘图</span>
+<span style="color: #000000;">plt.figure()
+plt.bar(x</span>=province_dict_keys,height=province_dict_values,alpha=0.8<span style="color: #000000;">)
+</span><span style="color: #0000ff;">for</span> x,y <span style="color: #0000ff;">in</span><span style="color: #000000;"> enumerate(province_dict_values):
+    plt.text(x, y, </span><span style="color: #800000;">'</span><span style="color: #800000;">%s</span><span style="color: #800000;">'</span> % y, ha=<span style="color: #800000;">'</span><span style="color: #800000;">center</span><span style="color: #800000;">'</span>, va=<span style="color: #800000;">'</span><span style="color: #800000;">bottom</span><span style="color: #800000;">'</span><span style="color: #000000;">)
+</span><span style="color: #008000;">#</span><span style="color: #008000;">设置标题</span>
+plt.title(<span style="color: #800000;">"</span><span style="color: #800000;">排名前10的省份</span><span style="color: #800000;">"</span><span style="color: #000000;">)
+</span><span style="color: #008000;">#</span><span style="color: #008000;"> 为两条坐标轴设置名称</span>
+plt.xlabel(<span style="color: #800000;">"</span><span style="color: #800000;">省份</span><span style="color: #800000;">"</span><span style="color: #000000;">)
+plt.ylabel(</span><span style="color: #800000;">"</span><span style="color: #800000;">平均分</span><span style="color: #800000;">"</span><span style="color: #000000;">)
+</span><span style="color: #008000;">#</span><span style="color: #008000;">图片的显示及存储</span>
+log = datetime.datetime.now().strftime(<span style="color: #800000;">'</span><span style="color: #800000;">%Y-%m-%d</span><span style="color: #800000;">'</span><span style="color: #000000;">)
+</span><span style="color: #008000;">#</span><span style="color: #008000;"> plt.savefig('./logging/%s_all_a.jpg' % log)   #图片的存储</span><span style="color: #008000;">
+#</span><span style="color: #008000;"> plt.close()   #关闭matplotlib<br /></span></pre>
+</div>
+<div class="cnblogs_code">
+<pre>bar = Bar(<span style="color: #800000;">"</span><span style="color: #800000;">柱状图</span><span style="color: #800000;">"</span>, <span style="color: #800000;">"</span><span style="color: #800000;">%s本一批的平均分数</span><span style="color: #800000;">"</span>%<span style="color: #000000;">year)
+bar.add(</span><span style="color: #800000;">"</span><span style="color: #800000;">平均录取分数</span><span style="color: #800000;">"</span>, province_dict_keys, province_dict_values, mark_line=[<span style="color: #800000;">"</span><span style="color: #800000;">average</span><span style="color: #800000;">"</span>], mark_point=[<span style="color: #800000;">"</span><span style="color: #800000;">max</span><span style="color: #800000;">"</span>, <span style="color: #800000;">"</span><span style="color: #800000;">min</span><span style="color: #800000;">"</span><span style="color: #000000;">])
+</span><span style="color: #008000;">#</span><span style="color: #008000;"> 生成本地文件（默认为.html文件）</span>
+bar.render(<span style="color: #800000;">'</span><span style="color: #800000;">./templates/ten.html</span><span style="color: #800000;">'</span>)</pre>
+</div>
+<p>&nbsp;</p>
+<p>4、折线图：分析福建省这3年各批次成绩情况，使用折线图展示结果，并预测2019年录取成绩</p>
+<p><img src="./images/1798975-20191208153624273-175144926.png" alt="" /></p>
+<div class="cnblogs_code">
+<pre><span style="color: #008000;">#</span><span style="color: #008000;">折线图</span>
+<span style="color: #000000;">
+plt.figure()
+
+plt.plot(grade_year,grade,</span><span style="color: #800000;">'</span><span style="color: #800000;">ro-</span><span style="color: #800000;">'</span>, color=<span style="color: #800000;">'</span><span style="color: #800000;">#4169E1</span><span style="color: #800000;">'</span>, alpha=0.8, label=<span style="color: #800000;">'</span><span style="color: #800000;">提前批航海类（理工）</span><span style="color: #800000;">'</span><span style="color: #000000;">)
+
+plt.plot(grade_year,grade1,</span><span style="color: #800000;">'</span><span style="color: #800000;">ro-</span><span style="color: #800000;">'</span>, color=<span style="color: #800000;">'</span><span style="color: #800000;">#FFFA12</span><span style="color: #800000;">'</span>, alpha=0.8, label=<span style="color: #800000;">'</span><span style="color: #800000;">师范类(面向全省)（理工）</span><span style="color: #800000;">'</span><span style="color: #000000;">)
+
+plt.plot(grade_year,grade2,</span><span style="color: #800000;">'</span><span style="color: #800000;">ro-</span><span style="color: #800000;">'</span>, color=<span style="color: #800000;">'</span><span style="color: #800000;">#78FF1D</span><span style="color: #800000;">'</span>, alpha=0.8, label=<span style="color: #800000;">'</span><span style="color: #800000;">师范类(面向厦门)（理工）</span><span style="color: #800000;">'</span><span style="color: #000000;">)
+
+plt.plot(grade_year,grade3,</span><span style="color: #800000;">'</span><span style="color: #800000;">ro-</span><span style="color: #800000;">'</span>, color=<span style="color: #800000;">'</span><span style="color: #800000;">#1CFFB7</span><span style="color: #800000;">'</span>, alpha=0.8, label=<span style="color: #800000;">'</span><span style="color: #800000;">农村专项计划（理工）</span><span style="color: #800000;">'</span><span style="color: #000000;">)
+
+plt.plot(grade_year,grade4,</span><span style="color: #800000;">'</span><span style="color: #800000;">ro-</span><span style="color: #800000;">'</span>, color=<span style="color: #800000;">'</span><span style="color: #800000;">#1BE9FF</span><span style="color: #800000;">'</span>, alpha=0.8, label=<span style="color: #800000;">'</span><span style="color: #800000;">本一批（理工）</span><span style="color: #800000;">'</span><span style="color: #000000;">)
+
+plt.plot(grade_year,grade5,</span><span style="color: #800000;">'</span><span style="color: #800000;">ro-</span><span style="color: #800000;">'</span>, color=<span style="color: #800000;">'</span><span style="color: #800000;">#1F98FF</span><span style="color: #800000;">'</span>, alpha=0.8, label=<span style="color: #800000;">'</span><span style="color: #800000;">本一批(面向厦门)（理工）</span><span style="color: #800000;">'</span><span style="color: #000000;">)
+
+plt.plot(grade_year,grade6,</span><span style="color: #800000;">'</span><span style="color: #800000;">ro-</span><span style="color: #800000;">'</span>, color=<span style="color: #800000;">'</span><span style="color: #800000;">#2237FF</span><span style="color: #800000;">'</span>, alpha=0.8, label=<span style="color: #800000;">'</span><span style="color: #800000;">闽台合作（理工）</span><span style="color: #800000;">'</span><span style="color: #000000;">)
+
+plt.plot(grade_year,grade7,</span><span style="color: #800000;">'</span><span style="color: #800000;">ro-</span><span style="color: #800000;">'</span>, color=<span style="color: #800000;">'</span><span style="color: #800000;">#BA6BFF</span><span style="color: #800000;">'</span>, alpha=0.8, label=<span style="color: #800000;">'</span><span style="color: #800000;">预科批（理工）</span><span style="color: #800000;">'</span>) <span style="color: #008000;">#</span><span style="color: #008000;">在当前绘图对象绘图（X轴，Y轴，蓝色虚线，线宽度）</span>
+
+<span style="color: #0000ff;">for</span> y <span style="color: #0000ff;">in</span><span style="color: #000000;"> [grade,grade1,grade2,grade3,grade4,grade5,grade6,grade7]:
+
+    </span><span style="color: #0000ff;">for</span> x,yy <span style="color: #0000ff;">in</span><span style="color: #000000;"> zip(grade_year,y):
+
+        plt.text(x, yy</span>+1,str(yy), ha=<span style="color: #800000;">'</span><span style="color: #800000;">center</span><span style="color: #800000;">'</span>, va=<span style="color: #800000;">'</span><span style="color: #800000;">bottom</span><span style="color: #800000;">'</span>, fontsize=7<span style="color: #000000;">)
+
+plt.xlabel(</span><span style="color: #800000;">"</span><span style="color: #800000;">年份</span><span style="color: #800000;">"</span>) <span style="color: #008000;">#</span><span style="color: #008000;">X轴标签</span>
+<span style="color: #000000;">
+plt.ylabel(</span><span style="color: #800000;">"</span><span style="color: #800000;">分数线</span><span style="color: #800000;">"</span>) <span style="color: #008000;">#</span><span style="color: #008000;">Y轴标签</span>
+<span style="color: #000000;">
+plt.title(</span><span style="color: #800000;">"</span><span style="color: #800000;">福建省这3年理工各批次成绩情况</span><span style="color: #800000;">"</span>) <span style="color: #008000;">#</span><span style="color: #008000;">标题</span>
+
+<span style="color: #008000;">#</span><span style="color: #008000;"> plt.savefig('./logging/%s_all_b.jpg' % log)   #图片的存储</span>
+
+<span style="color: #008000;">#</span><span style="color: #008000;">显示图示</span>
+<span style="color: #000000;">
+plt.legend()
+
+plt.show()</span></pre>
+</div>
+<p>&nbsp;</p>
+<div class="cnblogs_code">
+<pre>line = Line(<span style="color: #800000;">"</span><span style="color: #800000;">折线图</span><span style="color: #800000;">"</span>,<span style="color: #800000;">"</span><span style="color: #800000;">%s批次情况分析</span><span style="color: #800000;">"</span>%<span style="color: #000000;">otherProvince)
+line.add(</span><span style="color: #800000;">""</span>, grade_batch, batch_grade, is_label_show=<span style="color: #000000;">True)
+line.render(</span><span style="color: #800000;">'</span><span style="color: #800000;">./templates/otherProvince.html</span><span style="color: #800000;">'</span>)</pre>
+</div>
+<p>&nbsp;</p>
+<p>5、热力图：分析其他省份数据。有精力同学可以研究热力图，地图方式绘制所有省份数据情况。</p>
+<p>&nbsp; <img src="./images/1798975-20191208153729787-1104662193.png" alt="" /></p>
+<div class="cnblogs_code">
+<pre>gr=batch(<span style="color: #800000;">'</span><span style="color: #800000;">本一批</span><span style="color: #800000;">'</span>,<span style="color: #800000;">'</span><span style="color: #800000;">理工</span><span style="color: #800000;">'</span><span style="color: #000000;">)
+
+gr</span>=sorted(gr.items(),key=<span style="color: #0000ff;">lambda</span> x:x[1],reverse=<span style="color: #000000;">True)
+
+file </span>= open(r<span style="color: #800000;">'</span><span style="color: #800000;">../point.json</span><span style="color: #800000;">'</span>,<span style="color: #800000;">'</span><span style="color: #800000;">w</span><span style="color: #800000;">'</span>) <span style="color: #008000;">#</span><span style="color: #008000;">建立json数据文件</span>
+<span style="color: #000000;">
+point_pr(gr,file)
+
+</span><span style="color: #008000;">#</span><span style="color: #008000;">获取经纬度</span>
+
+<span style="color: #0000ff;">def</span><span style="color: #000000;"> getlnglat(address):
+    url </span>= <span style="color: #800000;">'</span><span style="color: #800000;">http://api.map.baidu.com/geocoding/v3/</span><span style="color: #800000;">'</span><span style="color: #000000;">
+    output </span>= <span style="color: #800000;">'</span><span style="color: #800000;">json</span><span style="color: #800000;">'</span><span style="color: #000000;">
+    ak </span>= <span style="color: #800000;">'</span><span style="color: #800000;">8atpMUyuexdbuYFU838ejPvSPnWYZoks</span><span style="color: #800000;">'</span><span style="color: #000000;">
+    add </span>= quote(address) <span style="color: #008000;">#</span><span style="color: #008000;">由于本文城市变量为中文，为防止乱码，先用quote进行编码</span><span style="color: #000000;">
+    uri </span>= url + <span style="color: #800000;">'</span><span style="color: #800000;">?</span><span style="color: #800000;">'</span> + <span style="color: #800000;">'</span><span style="color: #800000;">address=</span><span style="color: #800000;">'</span> + add  + <span style="color: #800000;">'</span><span style="color: #800000;">&amp;output=</span><span style="color: #800000;">'</span> + output + <span style="color: #800000;">'</span><span style="color: #800000;">&amp;ak=</span><span style="color: #800000;">'</span> +<span style="color: #000000;"> ak
+    req </span>=<span style="color: #000000;"> urlopen(uri)
+    res </span>= req.read().decode() <span style="color: #008000;">#</span><span style="color: #008000;">将其他编码的字符串解码成unicode</span><span style="color: #000000;">
+    temp </span>= json.loads(res) <span style="color: #008000;">#</span><span style="color: #008000;">对json数据进行解析</span>
+    <span style="color: #0000ff;">return</span><span style="color: #000000;"> temp
+</span><span style="color: #0000ff;">def</span><span style="color: #000000;"> point_pr(gr,file):
+</span><span style="color: #008000;">#</span><span style="color: #008000;">每个省份的经纬度</span>
+    <span style="color: #0000ff;">print</span><span style="color: #000000;">(gr)
+    </span><span style="color: #0000ff;">for</span> line <span style="color: #0000ff;">in</span><span style="color: #000000;"> gr:
+        </span><span style="color: #008000;">#</span><span style="color: #008000;"> line是个list，取得所有需要的值</span><span style="color: #000000;">
+        b </span>= line[0] <span style="color: #008000;">#</span><span style="color: #008000;">将第一列city读取出来并清除不需要字符</span>
+        <span style="color: #0000ff;">if</span> b == <span style="color: #800000;">'</span><span style="color: #800000;">西藏</span><span style="color: #800000;">'</span> <span style="color: #0000ff;">or</span> b == <span style="color: #800000;">''</span><span style="color: #000000;">:
+            </span><span style="color: #0000ff;">continue</span><span style="color: #000000;">
+        c</span>= line[1]<span style="color: #008000;">#</span><span style="color: #008000;">将第二列price读取出来并清除不需要字符</span><span style="color: #000000;">
+        lng </span>= getlnglat(b)[<span style="color: #800000;">'</span><span style="color: #800000;">result</span><span style="color: #800000;">'</span>][<span style="color: #800000;">'</span><span style="color: #800000;">location</span><span style="color: #800000;">'</span>][<span style="color: #800000;">'</span><span style="color: #800000;">lng</span><span style="color: #800000;">'</span>] <span style="color: #008000;">#</span><span style="color: #008000;">采用构造的函数来获取经度</span><span style="color: #000000;">
+        lat </span>= getlnglat(b)[<span style="color: #800000;">'</span><span style="color: #800000;">result</span><span style="color: #800000;">'</span>][<span style="color: #800000;">'</span><span style="color: #800000;">location</span><span style="color: #800000;">'</span>][<span style="color: #800000;">'</span><span style="color: #800000;">lat</span><span style="color: #800000;">'</span>] <span style="color: #008000;">#</span><span style="color: #008000;">获取纬度</span><span style="color: #000000;">
+        str_temp </span>= <span style="color: #800000;">'</span><span style="color: #800000;">{"lat":</span><span style="color: #800000;">'</span> + str(lat) + <span style="color: #800000;">'</span><span style="color: #800000;">,"lng":</span><span style="color: #800000;">'</span> + str(lng) + <span style="color: #800000;">'</span><span style="color: #800000;">,"count":</span><span style="color: #800000;">'</span> + str(c) +<span style="color: #800000;">'</span><span style="color: #800000;">},</span><span style="color: #800000;">'</span>
+        <span style="color: #008000;">#</span><span style="color: #008000;"> print(str_temp) #也可以通过打印出来，把数据copy到百度热力地图api的相应位置上</span><span style="color: #000000;">
+        file.write(str_temp) </span><span style="color: #008000;">#</span><span style="color: #008000;">写入文档</span><span style="color: #000000;">
+    file.close()</span></pre>
+</div>
+<p>6、根据输入的省份分析录取分数情况：</p>
+<p><img src="./images/1798975-20191216130126155-666845011.png" alt="" /></p>
+<div class="cnblogs_code">
+<pre><span style="color: #0000ff;">def</span><span style="color: #000000;"> province_line(province):
+        </span><span style="color: #0000ff;">print</span><span style="color: #000000;">(province)
+        grade1_year</span>=[2016,2017,2018<span style="color: #000000;">]
+        grade_priv</span>=<span style="color: #000000;">[]
+        </span><span style="color: #0000ff;">for</span> e <span style="color: #0000ff;">in</span><span style="color: #000000;"> grade1_year:
+            count</span>=<span style="color: #000000;">0
+            sum</span>=<span style="color: #000000;">0
+            </span><span style="color: #0000ff;">for</span> grade_list_row <span style="color: #0000ff;">in</span><span style="color: #000000;"> grade_list:
+                </span><span style="color: #0000ff;">if</span> e ==grade_list_row[7] <span style="color: #0000ff;">and</span> province==<span style="color: #000000;">grade_list_row[0]:
+                    sum</span>+=grade_list_row[6<span style="color: #000000;">]
+                    count</span>+=1
+            <span style="color: #0000ff;">if</span> count&gt;1<span style="color: #000000;">:
+                grade_priv.append(sum</span>/<span style="color: #000000;">count)
+            </span><span style="color: #0000ff;">else</span><span style="color: #000000;">:
+                grade_priv.append(sum)
+        plt.figure()
+        </span><span style="color: #0000ff;">print</span><span style="color: #000000;">(grade1_year,grade_priv)
+        plt.plot(grade1_year,grade_priv,</span><span style="color: #800000;">'</span><span style="color: #800000;">ro-</span><span style="color: #800000;">'</span>, color=<span style="color: #800000;">'</span><span style="color: #800000;">#4169E1</span><span style="color: #800000;">'</span>, alpha=0.8<span style="color: #000000;">)
+        </span><span style="color: #0000ff;">for</span> x,y <span style="color: #0000ff;">in</span><span style="color: #000000;"> zip(grade1_year,grade_priv):
+            plt.text(x, y</span>+1,str(y), ha=<span style="color: #800000;">'</span><span style="color: #800000;">center</span><span style="color: #800000;">'</span>, va=<span style="color: #800000;">'</span><span style="color: #800000;">bottom</span><span style="color: #800000;">'</span>, fontsize=7<span style="color: #000000;">)
+        plt.xlabel(</span><span style="color: #800000;">"</span><span style="color: #800000;">年份</span><span style="color: #800000;">"</span>) <span style="color: #008000;">#</span><span style="color: #008000;">X轴标签</span>
+        plt.ylabel(<span style="color: #800000;">"</span><span style="color: #800000;">分数线</span><span style="color: #800000;">"</span>) <span style="color: #008000;">#</span><span style="color: #008000;">Y轴标签</span>
+        plt.title(<span style="color: #800000;">"</span><span style="color: #800000;">成绩情况</span><span style="color: #800000;">"</span>) <span style="color: #008000;">#</span><span style="color: #008000;">标题</span>
+        plt.savefig(<span style="color: #800000;">'</span><span style="color: #800000;">./static/logging/2019-12-08_all_d.jpg</span><span style="color: #800000;">'</span>)   <span style="color: #008000;">#</span><span style="color: #008000;">图片的存储</span></pre>
+</div>
+<p>&nbsp;7、饼状图</p>
+<p><img src="./images/1798975-20191221133822620-382805024.png" alt="" /></p>
+<div class="cnblogs_code">
+<pre>    <span style="color: #008000;">#</span><span style="color: #008000;"> //设置主标题与副标题，标题设置居中，设置宽度为900</span>
+    pie = Pie(<span style="color: #800000;">"</span><span style="color: #800000;">饼状图</span><span style="color: #800000;">"</span>, <span style="color: #800000;">"</span><span style="color: #800000;">福建省这3年各批次成绩情况</span><span style="color: #800000;">"</span>,title_pos=<span style="color: #800000;">'</span><span style="color: #800000;">top</span><span style="color: #800000;">'</span>,width=900<span style="color: #000000;">)
+    </span><span style="color: #008000;">#</span><span style="color: #008000;"> //加入数据，设置坐标位置为【25，50】，上方的colums选项取消显示</span>
+    pie.add(<span style="color: #800000;">"</span><span style="color: #800000;">降水量</span><span style="color: #800000;">"</span>, grade_batch, batch_grade ,center=[40,50],is_legend_show=False,is_label_show=<span style="color: #000000;">True)
+    </span><span style="color: #008000;">#</span><span style="color: #008000;"> //保存图表</span>
+    pie.render(<span style="color: #800000;">'</span><span style="color: #800000;">./templates/pie_batch.html</span><span style="color: #800000;">'</span>)</pre>
+</div>
+<p>8、雷达图</p>
+<div class="cnblogs_code">
+<pre>        radar = Radar(<span style="color: #800000;">"</span><span style="color: #800000;">雷达图</span><span style="color: #800000;">"</span>, <span style="color: #800000;">"</span><span style="color: #800000;">一年的降水量与蒸发量</span><span style="color: #800000;">"</span><span style="color: #000000;">)
+        schema </span>=[(<span style="color: #800000;">'</span><span style="color: #800000;">网络1611</span><span style="color: #800000;">'</span>,100), (<span style="color: #800000;">'</span><span style="color: #800000;">网络1612</span><span style="color: #800000;">'</span>,100), (<span style="color: #800000;">'</span><span style="color: #800000;">网络1613</span><span style="color: #800000;">'</span>,100<span style="color: #000000;">),
+                 (</span><span style="color: #800000;">'</span><span style="color: #800000;">网络1711</span><span style="color: #800000;">'</span>,100), (<span style="color: #800000;">'</span><span style="color: #800000;">网络1712</span><span style="color: #800000;">'</span>,100), (<span style="color: #800000;">'</span><span style="color: #800000;">网络1714</span><span style="color: #800000;">'</span>,100<span style="color: #000000;">),
+                 ( </span><span style="color: #800000;">'</span><span style="color: #800000;">网络1811</span><span style="color: #800000;">'</span>,100), (<span style="color: #800000;">'</span><span style="color: #800000;">网络1814</span><span style="color: #800000;">'</span>,100), (<span style="color: #800000;">'</span><span style="color: #800000;">网络1813</span><span style="color: #800000;">'</span>,100<span style="color: #000000;">)]
+        </span><span style="color: #008000;">#</span><span style="color: #008000;"> //传入坐标</span>
+<span style="color: #000000;">        radar.config(schema)
+        </span><span style="color: #008000;">#</span><span style="color: #008000;"> //一般默认为同一种颜色，这里为了便于区分，需要设置item的颜色</span>
+        radar.add(<span style="color: #800000;">"</span><span style="color: #800000;">蒸发量</span><span style="color: #800000;">"</span>,score1,item_color=<span style="color: #800000;">"</span><span style="color: #800000;">#1C86EE</span><span style="color: #800000;">"</span><span style="color: #000000;">)
+        radar.render(</span><span style="color: #800000;">'</span><span style="color: #800000;">./templates/sex.html</span><span style="color: #800000;">'</span>)</pre>
+</div>
+<p>&nbsp;</p>
+<p>码云地址：https://gitee.com/leaf28/university.git</p>

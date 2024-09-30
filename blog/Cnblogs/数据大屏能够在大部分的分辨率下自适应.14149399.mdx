@@ -1,0 +1,39 @@
+<p>1.创建flexible.js文件</p>
+<div class="cnblogs_code">
+<pre>import store from '@/store'
+<span style="color: #008000;">//</span><span style="color: #008000;">设置基础字号</span>
+const baseSize = 16
+<span style="color: #008000;">//</span><span style="color: #008000;">设置基本缩放比</span>
+let scaleRate = 1<span style="color: #000000;">;
+</span><span style="color: #008000;">//</span><span style="color: #008000;"> 设置 rem 函数</span>
+<span style="color: #0000ff;">function</span><span style="color: #000000;"> setRem() {
+  </span><span style="color: #008000;">//</span><span style="color: #008000;"> 当前页面宽度相对于 1920 宽的缩放比例，可根据自己需要修改。</span>
+  const scale = document.documentElement.clientWidth / 1920<span style="color: #000000;">
+  
+  scaleRate </span>=<span style="color: #000000;"> scale
+  </span><span style="color: #0000ff;">if</span> (scaleRate &gt; 1.5<span style="color: #000000;">) {
+    store.commit(</span>"newScreen/setScaleRate", 1.5<span style="color: #000000;">)
+  } </span><span style="color: #0000ff;">else</span> <span style="color: #0000ff;">if</span> (scaleRate &lt; 0.5<span style="color: #000000;">) {
+
+    store.commit(</span>"newScreen/setScaleRate", 0.5<span style="color: #000000;">)
+  } </span><span style="color: #0000ff;">else</span><span style="color: #000000;"> {
+    store.commit(</span>"newScreen/setScaleRate"<span style="color: #000000;">, scaleRate)
+  }
+  </span><span style="color: #008000;">//</span><span style="color: #008000;"> 设置页面根节点字体大小</span>
+  <span style="color: #0000ff;">if</span> (document.documentElement.clientWidth &gt; 2880<span style="color: #000000;">) {
+    document.documentElement.style.fontSize </span>= 14 + 'px'<span style="color: #000000;">
+  } </span><span style="color: #0000ff;">else</span><span style="color: #000000;"> {
+    document.documentElement.style.fontSize </span>= (baseSize * scale) + 'px'<span style="color: #000000;">
+  }
+}
+</span><span style="color: #008000;">//</span><span style="color: #008000;"> 初始化</span>
+<span style="color: #000000;">setRem()
+</span><span style="color: #008000;">//</span><span style="color: #008000;"> 改变窗口大小时重新设置 rem</span>
+window.onresize = <span style="color: #0000ff;">function</span><span style="color: #000000;"> () {
+  setRem()
+}</span></pre>
+</div>
+<p>2.在main.js中引用</p>
+<div>import&nbsp;'@/utils/flexible.js'</div>
+<div>3.把px转换成rem</div>
+<div>4.大屏中会有使用echarts，把scaleRate存放在vuex中，然后再echarts中进行相乘，如此图表中的文字和宽高也能自适应</div>
